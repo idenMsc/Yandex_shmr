@@ -19,7 +19,7 @@ class TransactionRemoteDataSource {
       url,
       headers: {
         'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/jso',
       },
     );
     if (response.statusCode == 200) {

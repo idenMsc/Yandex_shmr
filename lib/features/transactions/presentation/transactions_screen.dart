@@ -34,9 +34,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           if (state is TransactionLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is TransactionLoaded) {
-            if(state.transactions.isEmpty) {
-              return const Center(child: Text('Транзакций пока нет'),);
-            }
+            // if(state.transactions.isEmpty) {
+            //   return const Center(child: Text('Транзакций пока нет'),);
+            // }
             return Column(
               children: [
                 Padding(

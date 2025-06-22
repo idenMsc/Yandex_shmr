@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shmr_25/features/transactions/data/mock_account_remote_data_source.dart';
+import 'package:shmr_25/features/transactions/data/mock_transaction_remote_data_source.dart';
 import 'core/utils/constants.dart';
 import 'features/transactions/presentation/transactions_screen.dart';
 import 'features/transactions/transaction_bloc.dart';
@@ -20,11 +22,10 @@ class FinanceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accountRemoteDataSource =
-        AccountRemoteDataSource(baseUrl: baseUrl, token: token);
+        MockAccountRemoteDataSource();
     final transactionRemoteDataSource =
-        TransactionRemoteDataSource(baseUrl: baseUrl, token: token);
-    final transactionRepository = TransactionRepositoryImpl(
-        remoteDataSource: transactionRemoteDataSource);
+        MockTransactionRemoteDataSource();
+    final transactionRepository = TransactionRepositoryImpl(remoteDataSource: transactionRemoteDataSource);
 
     return MultiBlocProvider(
       providers: [
@@ -160,7 +161,8 @@ class _CustomBottomBar extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFDFFFE2) : Colors.transparent,
+                  color:
+                      isSelected ? const Color(0xFFDFFFE2) : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
