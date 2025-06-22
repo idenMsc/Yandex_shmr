@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'core/utils/constants.dart';
+import 'features/transactions/presentation/transactions_screen.dart';
+import 'features/transactions/transaction_bloc.dart';
+import 'features/transactions/transaction_event.dart';
+import 'features/transactions/transaction_state.dart';
+import 'features/transactions/data/transaction_repository_impl.dart';
+import 'features/transactions/data/transaction_remote_data_source.dart';
+import 'features/transactions/data/account_remote_data_source.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(const FinanceApp());
@@ -10,13 +19,30 @@ class FinanceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SHMR Finance',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        scaffoldBackgroundColor: Colors.white,
+    final accountRemoteDataSource =
+        AccountRemoteDataSource(baseUrl: baseUrl, token: token);
+    final transactionRemoteDataSource =
+        TransactionRemoteDataSource(baseUrl: baseUrl, token: token);
+    final transactionRepository = TransactionRepositoryImpl(
+        remoteDataSource: transactionRemoteDataSource);
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<TransactionBloc>(
+          create: (context) => TransactionBloc(
+            transactionRepository: transactionRepository,
+            accountRemoteDataSource: accountRemoteDataSource,
+          ),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'SHMR Finance',
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        home: const ExpensesScreen(),
       ),
-      home: const ExpensesScreen(),
     );
   }
 }
@@ -84,30 +110,15 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget _buildTabContent(int index) {
     switch (index) {
       case 0:
-        return ListView(
-          children: const [
-            ExpenseItem(icon: Icons.home, label: "Аренда", amount: "50 000 ₽"),
-            ExpenseItem(
-                icon: Icons.fastfood, label: "Продукты", amount: "8 000 ₽"),
-            ExpenseItem(
-                icon: Icons.sports, label: "Спортзал", amount: "3 000 ₽"),
-          ],
-        );
+        return const TransactionsScreen(isIncome: false);
       case 1:
-        return ListView(
-          children: const [
-            ExpenseItem(
-                icon: Icons.work, label: "Зарплата", amount: "150 000 ₽"),
-            ExpenseItem(
-                icon: Icons.card_giftcard, label: "Подарки", amount: "5 000 ₽"),
-          ],
-        );
+        return const TransactionsScreen(isIncome: true);
       case 2:
-        return Center(child: Text('Счет'));
+        return const Center(child: Text('Счет'));
       case 3:
-        return Center(child: Text('Статьи'));
+        return const Center(child: Text('Статьи'));
       case 4:
-        return Center(child: Text('Настройки'));
+        return const Center(child: Text('Настройки'));
       default:
         return Container();
     }
@@ -149,7 +160,7 @@ class _CustomBottomBar extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFFDFFFE2) : Colors.transparent,
+                  color: isSelected ? const Color(0xFFDFFFE2) : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
