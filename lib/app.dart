@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'screens/expenses_screen.dart';
+import 'screens/expenses_screen.dart' hide ExpensesScreen;
 import 'features/transactions/transaction_bloc.dart';
 import 'features/transactions/transaction_event.dart';
 import 'features/transactions/transaction_state.dart';
