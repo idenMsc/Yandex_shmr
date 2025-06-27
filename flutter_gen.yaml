@@ -1,0 +1,4 @@
+output: lib/gen/
+assets:
+  enabled: true
+  package_parameter_enabled: false 
