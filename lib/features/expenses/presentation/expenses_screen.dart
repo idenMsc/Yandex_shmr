@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'custom_bottom_bar.dart';
 import 'tab_item_data.dart';
+import '../../../gen/assets.gen.dart';
+import '../../bank_accounts/presentation/account_screen.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -13,41 +15,34 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
 
-  final List<TabItemData> _tabs = const [
+  final List<TabItemData> _tabs = [
     TabItemData(
-      icon: Icons.show_chart,
+      assetPath: Assets.icons.trendDown,
       label: 'Расходы',
     ),
     TabItemData(
-      assetPath: "assets/images/Dohody_item.svg",
+      assetPath: Assets.icons.trendUp,
       label: 'Доходы',
     ),
     TabItemData(
-      icon: Icons.calculate,
+      assetPath: Assets.icons.account,
       label: 'Счет',
     ),
     TabItemData(
-      icon: Icons.format_align_left,
+      assetPath: Assets.icons.expenseStats,
       label: 'Статьи',
     ),
     TabItemData(
-      icon: Icons.settings,
+      assetPath: Assets.icons.settings,
       label: 'Настройки',
     ),
-  ];
-  final List<String> _tabItems = [
-    "Мои расходы",
-    "Мои доходы",
-    "Мои счета",
-    "Мои статьи",
-    "Мои настройки"
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_tabItems[_selectedTab]),
+        title: Text(_tabs[_selectedTab].label),
         centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
@@ -92,7 +87,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ],
         );
       case 2:
-        return const Center(child: Text('Счет'));
+        return const AccountScreen();
       case 3:
         return const Center(child: Text('Статьи'));
       case 4:

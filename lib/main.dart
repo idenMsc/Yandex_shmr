@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'features/expenses/presentation/tab_item_data.dart';
+import 'gen/assets.gen.dart';
+import 'features/expenses/presentation/custom_bottom_bar.dart';
+
 void main() {
   runApp(const FinanceApp());
 }
@@ -31,25 +35,25 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
 
-  final List<_TabItemData> _tabs = const [
-    _TabItemData(
-      icon: Icons.show_chart,
+  final List<TabItemData> _tabs = [
+    TabItemData(
+      assetPath: Assets.icons.trendDown,
       label: 'Расходы',
     ),
-    _TabItemData(
-      assetPath: "assets/images/Dohody_item.svg",
+    TabItemData(
+      assetPath: Assets.icons.trendUp,
       label: 'Доходы',
     ),
-    _TabItemData(
-      icon: Icons.calculate,
+    TabItemData(
+      assetPath: Assets.icons.account,
       label: 'Счет',
     ),
-    _TabItemData(
-      icon: Icons.format_align_left,
+    TabItemData(
+      assetPath: Assets.icons.expenseStats,
       label: 'Статьи',
     ),
-    _TabItemData(
-      icon: Icons.settings,
+    TabItemData(
+      assetPath: Assets.icons.settings,
       label: 'Настройки',
     ),
   ];
@@ -58,7 +62,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Мои расходы"),
+        title: Text(_tabs[_selectedTab].label),
         centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
@@ -69,7 +73,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         backgroundColor: Colors.green,
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: _CustomBottomBar(
+      bottomNavigationBar: CustomBottomBar(
         tabs: _tabs,
         selectedIndex: _selectedTab,
         onTabSelected: (index) {
@@ -111,92 +115,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       default:
         return Container();
     }
-  }
-}
-
-class _TabItemData {
-  final IconData? icon;
-  final String label;
-  final String? assetPath;
-  const _TabItemData({this.icon, required this.label, this.assetPath});
-}
-
-class _CustomBottomBar extends StatelessWidget {
-  final List<_TabItemData> tabs;
-  final int selectedIndex;
-  final ValueChanged<int> onTabSelected;
-
-  const _CustomBottomBar({
-    required this.tabs,
-    required this.selectedIndex,
-    required this.onTabSelected,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFF7F4FA),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(tabs.length, (index) {
-          final isSelected = index == selectedIndex;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onTabSelected(index),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFFDFFFE2) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    tabs[index].assetPath != null
-                        ? (tabs[index].assetPath!.endsWith('.svg')
-                            ? SvgPicture.asset(
-                                tabs[index].assetPath!,
-                                height: 32,
-                                width: 32,
-                                // colorFilter: ColorFilter.mode(
-                                //   isSelected ? Colors.green : Colors.grey[700]!,
-                                //   BlendMode.srcIn,
-                                // ),
-                              )
-                            : Image.asset(
-                                tabs[index].assetPath!,
-                                height: 32,
-                                width: 32,
-                                color: isSelected
-                                    ? Colors.green
-                                    : Colors.grey[700],
-                              ))
-                        : Icon(
-                            tabs[index].icon,
-                            color: isSelected ? Colors.green : Colors.grey[700],
-                            size: 32,
-                          ),
-                    const SizedBox(height: 4),
-                    Text(
-                      tabs[index].label,
-                      style: TextStyle(
-                        color: isSelected ? Colors.green : Colors.grey[700],
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
   }
 }
 
