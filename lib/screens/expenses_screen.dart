@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../gen/assets.gen.dart';
 import '../widgets/custom_bottom_bar.dart';
 import '../widgets/expense_item.dart';
 import '../widgets/tab_item_data.dart';
@@ -15,25 +16,25 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
 
-  final List<TabItemData> _tabs = const [
+  final List<TabItemData> _tabs = [
     TabItemData(
-      icon: Icons.show_chart,
+      assetPath: Assets.icons.trendDown,
       label: 'Расходы',
     ),
     TabItemData(
-      assetPath: "assets/images/Dohody_item.svg",
+      assetPath: Assets.icons.trendUp,
       label: 'Доходы',
     ),
     TabItemData(
-      icon: Icons.calculate,
+      assetPath: Assets.icons.account,
       label: 'Счет',
     ),
     TabItemData(
-      icon: Icons.format_align_left,
+      assetPath: Assets.icons.expenseStats,
       label: 'Статьи',
     ),
     TabItemData(
-      icon: Icons.settings,
+      assetPath: Assets.icons.settings,
       label: 'Настройки',
     ),
   ];
@@ -42,7 +43,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Мои расходы"),
+        title: Text(_tabs[_selectedTab].label),
         centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
@@ -68,17 +69,60 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   Widget _buildTabContent(int index) {
     switch (index) {
       case 0:
-        return const TransactionsScreen(isIncome: false);
+        return ListView(
+          children: const [
+            ExpenseItem(icon: Icons.home, label: "Аренда", amount: "50 000 ₽"),
+            ExpenseItem(
+                icon: Icons.fastfood, label: "Продукты", amount: "8 000 ₽"),
+            ExpenseItem(
+                icon: Icons.sports, label: "Спортзал", amount: "3 000 ₽"),
+          ],
+        );
       case 1:
-        return const TransactionsScreen(isIncome: true);
+        return ListView(
+          children: const [
+            ExpenseItem(
+                icon: Icons.work, label: "Зарплата", amount: "150 000 ₽"),
+            ExpenseItem(
+                icon: Icons.card_giftcard, label: "Подарки", amount: "5 000 ₽"),
+          ],
+        );
       case 2:
-        return const Center(child: Text('Счет'));
+        return Center(child: Text('Счет'));
       case 3:
-        return const Center(child: Text('Статьи'));
+        return Center(child: Text('Статьи'));
       case 4:
-        return const Center(child: Text('Настройки'));
+        return Center(child: Text('Настройки'));
       default:
         return Container();
     }
+  }
+}
+
+class ExpenseItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String amount;
+
+  const ExpenseItem({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.amount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.green[100],
+        child: Icon(icon, color: Colors.green[800]),
+      ),
+      title: Text(label),
+      trailing: Text(
+        amount,
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
   }
 }

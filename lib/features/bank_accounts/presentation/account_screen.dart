@@ -9,21 +9,6 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F4FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4BE082),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Мой счет',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
-      ),
       body: ListView(
         children: [
           const SizedBox(height: 16),
