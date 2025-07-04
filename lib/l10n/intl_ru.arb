@@ -5,7 +5,8 @@
   "navBarAccount": "Счет",
   "navBarStats": "Статьи",
   "navBarSettings": "Настройки",
-  "total": "Всего",
+  "total": "Итого",
   "errorAccountNotFound": "Извините, произошла ошибка, счет не найден",
-  "noTransactions": "Отсутствуют информации о транзакциях"
+  "noTransactions": "Информация о транзакциях недоступна",
+  "decimalSeparator": ","
 } 

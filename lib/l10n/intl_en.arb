@@ -7,5 +7,6 @@
   "navBarSettings": "Settings",
   "total": "Total",
   "errorAccountNotFound": "Sorry, an error occurred, account not found",
-  "noTransactions": "No transaction information available"
+  "noTransactions": "No transaction information available",
+  "decimalSeparator": "."
 } 
