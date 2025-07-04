@@ -1,0 +1,11 @@
+{
+  "appTitle": "SHMR Finance",
+  "navBarExpenses": "Расходы",
+  "navBarIncome": "Доходы",
+  "navBarAccount": "Счет",
+  "navBarStats": "Статьи",
+  "navBarSettings": "Настройки",
+  "total": "Всего",
+  "errorAccountNotFound": "Извините, произошла ошибка, счет не найден",
+  "noTransactions": "Отсутствуют информации о транзакциях"
+} 

@@ -1,0 +1,11 @@
+{
+  "appTitle": "SHMR Finance",
+  "navBarExpenses": "Expenses",
+  "navBarIncome": "Income",
+  "navBarAccount": "Account",
+  "navBarStats": "Stats",
+  "navBarSettings": "Settings",
+  "total": "Total",
+  "errorAccountNotFound": "Sorry, an error occurred, account not found",
+  "noTransactions": "No transaction information available"
+} 

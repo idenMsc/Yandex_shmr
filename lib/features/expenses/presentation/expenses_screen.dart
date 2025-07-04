@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'custom_bottom_bar.dart';
 import 'tab_item_data.dart';
 import '../../../gen/assets.gen.dart';
 import '../../bank_accounts/presentation/account_screen.dart';
+import '../../../core/utils/constants.dart';
+import '../../../injection_container.dart' as di;
+import '../../bank_accounts/presentation/bloc/wallet_bloc.dart';
+import '../../bank_accounts/presentation/bloc/operation_bloc.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -14,6 +19,40 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
+
+  void _editAccountTitle() async {
+    final walletBloc = context.read<WalletBloc>();
+    final wallets = walletBloc.state;
+    if (wallets is! WalletsLoaded || wallets.wallets.isEmpty) return;
+
+    final controller = TextEditingController(text: wallets.wallets.first.name);
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('SHMR Finance'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Счет',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    if (result != null && result.isNotEmpty) {
+      // Обновляем название кошелька через BLoC
+      walletBloc.add(UpdateWalletName(wallets.wallets.first.id, result));
+    }
+  }
 
   final List<TabItemData> _tabs = [
     TabItemData(
@@ -40,27 +79,69 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_tabs[_selectedTab].label),
-        centerTitle: true,
-        backgroundColor: Colors.green,
-        elevation: 0,
-      ),
-      body: _buildTabContent(_selectedTab),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.add),
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        tabs: _tabs,
-        selectedIndex: _selectedTab,
-        onTabSelected: (index) {
-          setState(() {
-            _selectedTab = index;
-          });
-        },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<WalletBloc>(
+          create: (context) => di.sl<WalletBloc>(),
+        ),
+        BlocProvider<OperationBloc>(
+          create: (context) => di.sl<OperationBloc>(),
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: _selectedTab == 2
+              ? BlocBuilder<WalletBloc, WalletState>(
+                  builder: (context, state) {
+                    if (state is WalletsLoaded && state.wallets.isNotEmpty) {
+                      return Text(state.wallets.first.name,
+                          style: AppTextStyles.titleLarge);
+                    }
+                    return Text('Счет', style: AppTextStyles.titleLarge);
+                  },
+                )
+              : Text(_tabs[_selectedTab].label,
+                  style: AppTextStyles.titleLarge),
+          centerTitle: true,
+          backgroundColor: AppColors.primary,
+          elevation: 0,
+          toolbarHeight: AppSizes.appBarHeight,
+          actions: _selectedTab == 2
+              ? [
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/edit.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.onSurfaceVariant,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onPressed: _editAccountTitle,
+                  ),
+                ]
+              : [Container()],
+          actionsIconTheme: const IconThemeData(size: 24),
+          actionsPadding: const EdgeInsets.only(right: 4),
+        ),
+        body: _buildTabContent(_selectedTab),
+        floatingActionButton: _selectedTab == 2
+            ? FloatingActionButton(
+                onPressed: () {},
+                backgroundColor: AppColors.primary,
+                child: const Icon(Icons.add),
+              )
+            : null,
+        bottomNavigationBar: CustomBottomBar(
+          tabs: _tabs,
+          selectedIndex: _selectedTab,
+          onTabSelected: (index) {
+            setState(() {
+              _selectedTab = index;
+            });
+          },
+        ),
       ),
     );
   }
@@ -87,7 +168,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           ],
         );
       case 2:
-        return const AccountScreen();
+        return AccountScreen();
       case 3:
         return const Center(child: Text('Статьи'));
       case 4:
@@ -113,14 +194,19 @@ class ExpenseItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.green[100],
-        child: Icon(icon, color: Colors.green[800]),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.listTilePaddingH,
+        vertical: AppSizes.listTilePaddingV,
       ),
-      title: Text(label),
+      leading: CircleAvatar(
+        radius: AppSizes.avatarRadius,
+        backgroundColor: AppColors.primaryContainer,
+        child: Icon(icon, color: AppColors.primary),
+      ),
+      title: Text(label, style: AppTextStyles.bodyLarge),
       trailing: Text(
         amount,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }

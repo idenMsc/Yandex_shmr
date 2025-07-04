@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'tab_item_data.dart';
+import '../../../core/utils/constants.dart';
 
 class CustomBottomBar extends StatelessWidget {
   final List<TabItemData> tabs;
@@ -17,8 +18,9 @@ class CustomBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFF7F4FA),
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      color: AppColors.surfaceContainer,
+      height: AppSizes.bottomNavBarHeight,
+      padding: const EdgeInsets.symmetric(vertical: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(tabs.length, (index) {
@@ -28,10 +30,13 @@ class CustomBottomBar extends StatelessWidget {
               onTap: () => onTabSelected(index),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 0),
                 decoration: BoxDecoration(
-                  color: isSelected ? Color(0xFFDFFFE2) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
+                  color: isSelected
+                      ? AppColors.primaryContainer
+                      : Colors.transparent,
+                  borderRadius:
+                      BorderRadius.circular(AppSizes.navBarBorderRadius),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -40,30 +45,33 @@ class CustomBottomBar extends StatelessWidget {
                         ? (tabs[index].assetPath!.endsWith('.svg')
                             ? SvgPicture.asset(
                                 tabs[index].assetPath!,
-                                height: 32,
-                                width: 32,
+                                height: AppSizes.iconSize,
+                                width: AppSizes.iconSize,
                               )
                             : Image.asset(
                                 tabs[index].assetPath!,
-                                height: 32,
-                                width: 32,
+                                height: AppSizes.iconSize,
+                                width: AppSizes.iconSize,
                                 color: isSelected
-                                    ? Colors.green
-                                    : Colors.grey[700],
+                                    ? AppColors.primary
+                                    : AppColors.onSurfaceVariant,
                               ))
                         : Icon(
                             tabs[index].icon,
-                            color: isSelected ? Colors.green : Colors.grey[700],
-                            size: 32,
+                            color: isSelected
+                                ? AppColors.primary
+                                : AppColors.onSurfaceVariant,
+                            size: AppSizes.iconSize,
                           ),
                     const SizedBox(height: 4),
                     Text(
                       tabs[index].label,
-                      style: TextStyle(
-                        color: isSelected ? Colors.green : Colors.grey[700],
+                      style: AppTextStyles.labelMedium.copyWith(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.onSurfaceVariant,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 16,
                       ),
                     ),
                   ],
