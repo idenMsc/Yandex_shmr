@@ -27,11 +27,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get navBarSettings => 'Настройки';
 
   @override
-  String get total => 'Всего';
+  String get total => 'Итого';
 
   @override
-  String get errorAccountNotFound => 'Извините, произошла ошибка, счет не найден';
+  String get errorAccountNotFound =>
+      'Извините, произошла ошибка, счет не найден';
 
   @override
-  String get noTransactions => 'Отсутствуют информации о транзакциях';
+  String get noTransactions => 'Информация о транзакциях недоступна';
+
+  @override
+  String get decimalSeparator => ',';
 }

@@ -30,8 +30,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get total => 'Total';
 
   @override
-  String get errorAccountNotFound => 'Sorry, an error occurred, account not found';
+  String get errorAccountNotFound =>
+      'Sorry, an error occurred, account not found';
 
   @override
   String get noTransactions => 'No transaction information available';
+
+  @override
+  String get decimalSeparator => '.';
 }

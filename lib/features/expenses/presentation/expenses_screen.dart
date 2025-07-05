@@ -9,6 +9,7 @@ import '../../../core/utils/constants.dart';
 import '../../../injection_container.dart' as di;
 import '../../bank_accounts/presentation/bloc/wallet_bloc.dart';
 import '../../bank_accounts/presentation/bloc/operation_bloc.dart';
+import '../../transactions/presentation/operation_edit_screen.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -126,9 +127,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           actionsPadding: const EdgeInsets.only(right: 4),
         ),
         body: _buildTabContent(_selectedTab),
-        floatingActionButton: _selectedTab == 2
+        floatingActionButton: (_selectedTab == 0 || _selectedTab == 1)
             ? FloatingActionButton(
-                onPressed: () {},
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OperationEditScreen(
+                      isIncome: _selectedTab == 1,
+                    ),
+                  ),
+                ),
                 backgroundColor: AppColors.primary,
                 child: const Icon(Icons.add),
               )
