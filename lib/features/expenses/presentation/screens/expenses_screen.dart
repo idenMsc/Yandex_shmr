@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'custom_bottom_bar.dart';
-import 'tab_item_data.dart';
-import '../../../gen/assets.gen.dart';
-import '../../bank_accounts/presentation/account_screen.dart';
-import '../../../core/utils/constants.dart';
-import '../../../injection_container.dart' as di;
-import '../../bank_accounts/presentation/bloc/wallet_bloc.dart';
-import '../../bank_accounts/presentation/bloc/operation_bloc.dart';
-import '../../transactions/presentation/operation_edit_screen.dart';
+import 'package:shmr_25/features/expenses/presentation/widgets/expenses_item_widget.dart';
+import '../custom_bottom_bar.dart';
+import '../tab_item_data.dart';
+import '../../../../gen/assets.gen.dart';
+import '../../../bank_accounts/presentation/account_screen.dart';
+import '../../../../core/utils/constants.dart';
+import '../../../../injection_container.dart' as di;
+import '../../../bank_accounts/presentation/bloc/wallet_bloc.dart';
+import '../../../bank_accounts/presentation/bloc/operation_bloc.dart';
+import '../../../transactions/presentation/operation_edit_screen.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -187,35 +188,4 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 }
 
-class ExpenseItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String amount;
 
-  const ExpenseItem({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.amount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.listTilePaddingH,
-        vertical: AppSizes.listTilePaddingV,
-      ),
-      leading: CircleAvatar(
-        radius: AppSizes.avatarRadius,
-        backgroundColor: AppColors.primaryContainer,
-        child: Icon(icon, color: AppColors.primary),
-      ),
-      title: Text(label, style: AppTextStyles.bodyLarge),
-      trailing: Text(
-        amount,
-        style: AppTextStyles.bodyLarge.copyWith(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}

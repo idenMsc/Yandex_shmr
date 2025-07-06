@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shmr_25/features/expenses/presentation/screens/expenses_screen.dart';
+import 'features/expenses/presentation/screens/expenses_screen.dart';
 import 'l10n/app_localizations.dart';
-import 'features/expenses/presentation/expenses_screen.dart';
 import 'injection_container.dart' as di;
 
 void main() async {

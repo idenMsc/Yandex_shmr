@@ -1,10 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'domain/entities/transaction.dart';
-import 'domain/entities/account.dart';
 import 'data/transaction_repository_impl.dart';
 import 'data/account_remote_data_source.dart';
-import 'data/transaction_remote_data_source.dart';
 
 import 'transaction_event.dart';
 import 'transaction_state.dart';

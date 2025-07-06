@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
 import '../database.dart';
-import '../database_helper.dart';
 
 class WalletRepository {
   final FinanceDatabase _database;

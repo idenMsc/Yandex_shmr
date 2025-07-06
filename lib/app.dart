@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'screens/expenses_screen.dart';
+import 'features/expenses/presentation/screens/expenses_screen.dart';
 import 'features/transactions/transaction_bloc.dart';
-import 'features/transactions/transaction_event.dart';
-import 'features/transactions/transaction_state.dart';
 import 'features/transactions/data/transaction_repository_impl.dart';
 import 'features/transactions/data/mock_transaction_remote_data_source.dart';
 import 'features/transactions/data/mock_account_remote_data_source.dart';
-import 'main.dart';
 
 class FinanceApp extends StatelessWidget {
   const FinanceApp({super.key});
