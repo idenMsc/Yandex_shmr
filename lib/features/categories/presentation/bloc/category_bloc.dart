@@ -33,7 +33,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     switch (failure.runtimeType) {
       case ServerFailure:
         return "Server_Error";
-      case CacheFailure:
+      case CacheFailure _:
         return "Cache error";
       default:
         return "Unexpected error";

@@ -73,6 +73,7 @@ class CategoriesPageState extends State<CategoriesPage> {
               paddingLeft: width * 0.04,
               paddingRight: width * 0.04,
               title: searchWords[index],
+              wrapEmoji: true,
               emoji: emoji,
             );
           },
