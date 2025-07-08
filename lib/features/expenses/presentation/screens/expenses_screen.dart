@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shmr_25/features/expenses/presentation/widgets/expenses_item_widget.dart';
+import 'package:shmr_25/widgets/appSvg.dart';
 import '../../../categories/presentation/pages/categories_page.dart';
 import '../custom_bottom_bar.dart';
 import '../tab_item_data.dart';
@@ -131,17 +132,25 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         body: _buildTabContent(_selectedTab),
         floatingActionButton: (_selectedTab == 0 || _selectedTab == 1)
             ? FloatingActionButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OperationEditScreen(
-                      isIncome: _selectedTab == 1,
-                    ),
-                  ),
-                ),
-                backgroundColor: AppColors.primary,
-                child: const Icon(Icons.add),
-              )
+          backgroundColor: const Color.fromRGBO(42, 232, 129, 1),
+          foregroundColor: Colors.white,
+          shape: const CircleBorder(),
+          elevation: 0,
+          hoverElevation: 0,
+          focusElevation: 0,
+          highlightElevation: 0,
+          disabledElevation: 0,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OperationEditScreen(
+                isIncome: _selectedTab == 1,
+              ),
+            ),
+          ),
+          child: SvgPicture.asset('assets/icons/plus.svg', width: 24,
+            height: 24),
+        )
             : null,
         bottomNavigationBar: CustomBottomBar(
           tabs: _tabs,
