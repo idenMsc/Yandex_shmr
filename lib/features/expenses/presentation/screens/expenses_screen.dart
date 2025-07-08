@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shmr_25/features/expenses/presentation/widgets/expenses_item_widget.dart';
+import '../../../categories/presentation/pages/categories_page.dart';
 import '../custom_bottom_bar.dart';
 import '../tab_item_data.dart';
 import '../../../../gen/assets.gen.dart';
@@ -179,7 +180,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       case 2:
         return AccountScreen();
       case 3:
-        return const Center(child: Text('Статьи'));
+        return CategoriesPage();
       case 4:
         return const Center(child: Text('Настройки'));
       default:

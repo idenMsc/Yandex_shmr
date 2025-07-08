@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'data/transaction_repository_impl.dart';
 import 'data/account_remote_data_source.dart';
-
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 
@@ -20,10 +19,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   Future<void> _onDeleteTransaction(
     DeleteTransactionsEvent event,
     Emitter<TransactionState> emit,
-  ) async {
-
-
-  }
+  ) async {}
 
   Future<void> _onLoadTransactions(
     LoadTransactionsEvent event,

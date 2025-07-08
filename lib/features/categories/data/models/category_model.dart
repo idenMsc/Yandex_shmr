@@ -12,7 +12,7 @@ class CategoryModel with _$CategoryModel {
     required int id,
     required String name,
     required String emoji,
-    @JsonKey(name: 'isIncome') required bool isIncome,
+    required bool isIncome,
   }) = _CategoryModel;
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) =>
