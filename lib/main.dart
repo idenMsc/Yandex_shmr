@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shmr_25/features/expenses/presentation/screens/expenses_screen.dart';
+import 'features/bank_accounts/presentation/bloc/wallet_bloc.dart';
+import 'features/bank_accounts/presentation/bloc/operation_bloc.dart';
+import 'features/categories/presentation/bloc/category_bloc.dart';
 import 'l10n/app_localizations.dart';
 import 'injection_container.dart' as di;
 
@@ -15,23 +19,36 @@ class FinanceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SHMR Finance',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        scaffoldBackgroundColor: Colors.white,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<WalletBloc>(
+          create: (context) => di.sl<WalletBloc>(),
+        ),
+        BlocProvider<OperationBloc>(
+          create: (context) => di.sl<OperationBloc>(),
+        ),
+        BlocProvider<CategoryBloc>(
+          create: (context) => di.sl<CategoryBloc>()..add(LoadCategories()),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'SHMR Finance',
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'),
+          Locale('ru'),
+        ],
+        home: const ExpensesScreen(),
       ),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ru'),
-      ],
-      home: const ExpensesScreen(),
     );
   }
 }
