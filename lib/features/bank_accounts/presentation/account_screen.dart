@@ -197,65 +197,9 @@ class _AccountScreenState extends State<AccountScreen> {
             ],
           ),
         ),
-        Expanded(
-          child: BlocBuilder<OperationBloc, OperationState>(
-            builder: (context, state) {
-              if (state is OperationsLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is OperationsLoaded) {
-                if (state.operations.isEmpty) {
-                  return const Center(
-                    child: Text('Нет операций'),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: state.operations.length,
-                  itemBuilder: (context, index) {
-                    final operation = state.operations[index];
-                    final isIncome =
-                        operation.groupId <= 3; // 1-3 доходы, 4+ расходы
-                    final category =
-                        _getCategoryFromGroupId(operation.groupId, isIncome);
-
-                    return ListTile(
-                      onTap: () => OperationEditModal.show(
-                        context,
-                        isIncome: isIncome,
-                        initialOperation: operation,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: isIncome ? Colors.green : Colors.red,
-                        child: Icon(
-                          isIncome ? Icons.trending_up : Icons.trending_down,
-                          color: Colors.white,
-                        ),
-                      ),
-                      title: Text(category),
-                      subtitle: Text(operation.comment ?? ''),
-                      trailing: Text(
-                        '${operation.amount} ₽',
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isIncome ? Colors.green : Colors.red,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              } else if (state is OperationsError) {
-                return Center(
-                  child: Text(
-                    'Ошибка: ${state.message}',
-                    style: AppTextStyles.bodyLarge
-                        .copyWith(color: AppColors.error),
-                  ),
-                );
-              } else {
-                return const Center(child: Text('Загрузка операций...'));
-              }
-            },
-          ),
-        ),
+        // Удаляю историю операций и действия с ними
+        // Оставляю только отображение баланса, валюты и кнопки
+        const Spacer(),
       ],
     );
   }

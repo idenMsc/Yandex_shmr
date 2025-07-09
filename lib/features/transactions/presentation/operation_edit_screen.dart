@@ -37,6 +37,16 @@ class OperationEditModal extends StatefulWidget {
 
 class _OperationEditModalState extends State<OperationEditModal> {
   WalletDbModel? _selectedWallet;
+  // Используем тот же список категорий, что и на categories_page
+  final List<List<String>> _categories = [
+    ['Аренда квартиры', '🏡'],
+    ['Одежда', '👗'],
+    ['На собачку', '🐶'],
+    ['Ремонт квартиры'],
+    ['Продукты', '🍭'],
+    ['Спортзал', '🏋️'],
+    ['Медицина', '💊'],
+  ];
   Category? _selectedCategory;
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
@@ -68,35 +78,57 @@ class _OperationEditModalState extends State<OperationEditModal> {
   void _selectWallet(List<WalletDbModel> wallets) async {
     final selected = await showModalBottomSheet<WalletDbModel>(
       context: context,
-      builder: (context) => ListView(
-        children: wallets
-            .map((w) => ListTile(
-                  title: Text(w.name),
-                  subtitle: Text('${w.balance} ${w.currency}'),
-                  onTap: () => Navigator.pop(context, w),
-                ))
-            .toList(),
-      ),
+      builder: (context) => wallets.isEmpty
+          ? const Center(
+              child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Text('Нет доступных счетов'),
+            ))
+          : ListView(
+              children: wallets
+                  .map((w) => ListTile(
+                        title:
+                            Text(w.name), // <-- теперь отображается имя счета
+                        subtitle: Text('${w.balance} ${w.currency}'),
+                        onTap: () => Navigator.pop(context, w),
+                      ))
+                  .toList(),
+            ),
     );
     if (selected != null) setState(() => _selectedWallet = selected);
   }
 
   void _selectCategory(List<Category> categories) async {
-    final filtered =
-        categories.where((c) => c.isIncome == widget.isIncome).toList();
-    final selected = await showModalBottomSheet<Category>(
+    // Используем _categories вместо categories из Bloc
+    final selected = await showModalBottomSheet<Map<String, String>>(
       context: context,
-      builder: (context) => ListView(
-        children: filtered
-            .map((c) => ListTile(
-                  leading: Text(c.emoji),
-                  title: Text(c.name),
-                  onTap: () => Navigator.pop(context, c),
-                ))
-            .toList(),
-      ),
+      builder: (context) => _categories.isEmpty
+          ? const Center(
+              child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Text('Нет доступных категорий'),
+            ))
+          : ListView(
+              children: _categories
+                  .map((c) => ListTile(
+                        leading: Text(c.length > 1 ? c[1] : '📂'),
+                        title: Text(c[0]),
+                        onTap: () => Navigator.pop(context, {
+                          'name': c[0],
+                          'emoji': c.length > 1 ? c[1] : '📂'
+                        }),
+                      ))
+                  .toList(),
+            ),
     );
-    if (selected != null) setState(() => _selectedCategory = selected);
+    if (selected != null) {
+      setState(() => _selectedCategory = Category(
+            id: 0, // id не используется, можно доработать если потребуется
+            name: selected['name']!,
+            emoji: selected['emoji']!,
+            isIncome: widget.isIncome,
+          ));
+    }
   }
 
   Future<void> _selectDate() async {
@@ -121,33 +153,37 @@ class _OperationEditModalState extends State<OperationEditModal> {
     if (!isValid) return;
     final dt = DateTime(_selectedDate.year, _selectedDate.month,
         _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
+    // Для groupId используем 1 (доход) или 4 (расход) — как в тестовых данных
+    final groupId = widget.isIncome ? 1 : 4;
     final operation = OperationTableCompanion(
       walletId: drift.Value(_selectedWallet!.id),
-      groupId: drift.Value(_selectedCategory!.id),
+      groupId: drift.Value(groupId),
       amount: drift.Value(_amountController.text),
       operationDate: drift.Value(dt),
       comment: drift.Value(_commentController.text),
     );
     context.read<OperationBloc>().add(CreateOperation(operation));
+    // Немедленно обновляем историю
+    context.read<OperationBloc>().add(LoadOperations());
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: BlocBuilder<WalletBloc, WalletState>(
-        builder: (context, walletState) {
-          return BlocBuilder<CategoryBloc, CategoryState>(
-            builder: (context, categoryState) {
-              final wallets = walletState is WalletsLoaded
-                  ? walletState.wallets
-                  : <WalletDbModel>[];
-              final categories = categoryState is CategoryLoaded
-                  ? categoryState.categories
-                  : <Category>[];
-              return Container(
+    return BlocBuilder<WalletBloc, WalletState>(
+      builder: (context, walletState) {
+        return BlocBuilder<CategoryBloc, CategoryState>(
+          builder: (context, categoryState) {
+            final wallets = walletState is WalletsLoaded
+                ? walletState.wallets
+                : <WalletDbModel>[];
+            final categories = categoryState is CategoryLoaded
+                ? categoryState.categories
+                : <Category>[];
+            return Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).canvasColor,
                   borderRadius:
@@ -219,11 +255,11 @@ class _OperationEditModalState extends State<OperationEditModal> {
                     ],
                   ),
                 ),
-              );
-            },
-          );
-        },
-      ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

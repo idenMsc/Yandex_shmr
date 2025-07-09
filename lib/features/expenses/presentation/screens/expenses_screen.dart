@@ -24,6 +24,13 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // Гарантируем, что кошельки всегда загружены
+    context.read<WalletBloc>().add(LoadWallets());
+  }
+
   void _editAccountTitle() async {
     final walletBloc = context.read<WalletBloc>();
     final wallets = walletBloc.state;
@@ -83,83 +90,85 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<WalletBloc>(
-          create: (context) => di.sl<WalletBloc>(),
-        ),
-        BlocProvider<OperationBloc>(
-          create: (context) => di.sl<OperationBloc>(),
-        ),
-        BlocProvider<CategoryBloc>(
-          create: (context) => di.sl<CategoryBloc>()..add(LoadCategories()),
-        ),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: _selectedTab == 2
-              ? BlocBuilder<WalletBloc, WalletState>(
-                  builder: (context, state) {
-                    if (state is WalletsLoaded && state.wallets.isNotEmpty) {
-                      return Text(state.wallets.first.name,
-                          style: AppTextStyles.titleLarge);
-                    }
-                    return Text('Счет', style: AppTextStyles.titleLarge);
-                  },
-                )
-              : Text(_tabs[_selectedTab].label,
-                  style: AppTextStyles.titleLarge),
-          centerTitle: true,
-          backgroundColor: AppColors.primary,
-          elevation: 0,
-          toolbarHeight: AppSizes.appBarHeight,
-          actions: _selectedTab == 2
-              ? [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      'assets/icons/edit.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.onSurfaceVariant,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    onPressed: _editAccountTitle,
-                  ),
-                ]
-              : [Container()],
-          actionsIconTheme: const IconThemeData(size: 24),
-          actionsPadding: const EdgeInsets.only(right: 4),
-        ),
-        body: _buildTabContent(_selectedTab),
-        floatingActionButton: (_selectedTab == 0 || _selectedTab == 1)
-            ? FloatingActionButton(
-                backgroundColor: const Color.fromRGBO(42, 232, 129, 1),
-                foregroundColor: Colors.white,
-                shape: const CircleBorder(),
-                elevation: 0,
-                hoverElevation: 0,
-                focusElevation: 0,
-                highlightElevation: 0,
-                disabledElevation: 0,
-                onPressed: () => OperationEditModal.show(
-                  context,
-                  isIncome: _selectedTab == 1,
-                ),
-                child: SvgPicture.asset('assets/icons/plus.svg',
-                    width: 24, height: 24),
+    return Scaffold(
+      appBar: AppBar(
+        title: _selectedTab == 2
+            ? BlocBuilder<WalletBloc, WalletState>(
+                builder: (context, state) {
+                  if (state is WalletsLoaded && state.wallets.isNotEmpty) {
+                    return Text(state.wallets.first.name,
+                        style: AppTextStyles.titleLarge);
+                  }
+                  return Text('Счет', style: AppTextStyles.titleLarge);
+                },
               )
-            : null,
-        bottomNavigationBar: CustomBottomBar(
-          tabs: _tabs,
-          selectedIndex: _selectedTab,
-          onTabSelected: (index) {
-            setState(() {
-              _selectedTab = index;
-            });
-          },
-        ),
+            : Text(_tabs[_selectedTab].label, style: AppTextStyles.titleLarge),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        toolbarHeight: AppSizes.appBarHeight,
+        actions: _selectedTab == 0 || _selectedTab == 1
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.history),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OperationHistoryScreen(
+                          isIncome: _selectedTab == 1,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ]
+            : _selectedTab == 2
+                ? [
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/edit.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: const ColorFilter.mode(
+                          AppColors.onSurfaceVariant,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: _editAccountTitle,
+                    ),
+                  ]
+                : [Container()],
+        actionsIconTheme: const IconThemeData(size: 24),
+        actionsPadding: const EdgeInsets.only(right: 4),
+      ),
+      body: _buildTabContent(_selectedTab),
+      floatingActionButton: (_selectedTab == 0 || _selectedTab == 1)
+          ? FloatingActionButton(
+              backgroundColor: const Color.fromRGBO(42, 232, 129, 1),
+              foregroundColor: Colors.white,
+              shape: const CircleBorder(),
+              elevation: 0,
+              hoverElevation: 0,
+              focusElevation: 0,
+              highlightElevation: 0,
+              disabledElevation: 0,
+              onPressed: () => OperationEditModal.show(
+                context,
+                isIncome: _selectedTab == 1,
+              ),
+              child: SvgPicture.asset('assets/icons/plus.svg',
+                  width: 24, height: 24),
+            )
+          : null,
+      bottomNavigationBar: CustomBottomBar(
+        tabs: _tabs,
+        selectedIndex: _selectedTab,
+        onTabSelected: (index) {
+          setState(() {
+            _selectedTab = index;
+          });
+        },
       ),
     );
   }
@@ -279,6 +288,69 @@ class IncomeTodayList extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+// Экран истории операций
+class OperationHistoryScreen extends StatelessWidget {
+  final bool isIncome;
+  const OperationHistoryScreen({Key? key, required this.isIncome})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isIncome ? 'История доходов' : 'История расходов'),
+      ),
+      body: BlocBuilder<OperationBloc, OperationState>(
+        builder: (context, state) {
+          return BlocBuilder<CategoryBloc, CategoryState>(
+            builder: (context, catState) {
+              if (state is OperationsLoading || catState is CategoryLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is OperationsLoaded &&
+                  catState is CategoryLoaded) {
+                final categories = {for (var c in catState.categories) c.id: c};
+                final ops = state.operations.where((op) {
+                  final cat = categories[op.groupId];
+                  return cat != null && cat.isIncome == isIncome;
+                }).toList();
+                if (ops.isEmpty) {
+                  return Center(
+                      child: Text(isIncome ? 'Нет доходов' : 'Нет расходов'));
+                }
+                return ListView.separated(
+                  itemCount: ops.length,
+                  separatorBuilder: (_, __) => const Divider(),
+                  itemBuilder: (context, i) {
+                    final op = ops[i];
+                    final cat = categories[op.groupId];
+                    return ListTile(
+                      leading: Text(cat?.emoji ?? ''),
+                      title: Text(cat?.name ?? ''),
+                      subtitle: Text(op.comment ?? ''),
+                      trailing: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(op.amount),
+                          Text(
+                              '${op.operationDate.day.toString().padLeft(2, '0')}.${op.operationDate.month.toString().padLeft(2, '0')}.${op.operationDate.year}'),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              } else if (state is OperationsError) {
+                return Center(child: Text('Ошибка: ${state.message}'));
+              }
+              return const SizedBox.shrink();
+            },
+          );
+        },
+      ),
     );
   }
 }
