@@ -155,7 +155,8 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
     try {
       final result = await repository.createOperation(event.operation);
       if (result > 0) {
-        emit(OperationCreated());
+        // emit(OperationCreated()); // Убираем это состояние
+        // Не сбрасываем подписку, стрим сам обновит состояние
       } else {
         emit(const OperationsError('Не удалось создать операцию'));
       }

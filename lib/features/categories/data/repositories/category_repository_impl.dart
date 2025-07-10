@@ -15,7 +15,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
       final categories = await localDataSource.getAllCategories();
       return Right(categories);
     } catch (e) {
-      return Left(CacheFailure('Failed to get categories from cache'));
+      return const Left(CacheFailure('Failed to get categories from cache'));
     }
   }
 
@@ -25,7 +25,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
       final categories = await localDataSource.getIncomeCategories();
       return Right(categories);
     } catch (e) {
-      return Left(CacheFailure('Failed to get income categories from cache'));
+      return const Left(CacheFailure('Failed to get income categories from cache'));
     }
   }
 
@@ -35,7 +35,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
       final categories = await localDataSource.getExpenseCategories();
       return Right(categories);
     } catch (e) {
-      return Left(CacheFailure('Failed to get expense categories from cache'));
+      return const Left(CacheFailure('Failed to get expense categories from cache'));
     }
   }
 }

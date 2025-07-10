@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shmr_25/features/expenses/presentation/widgets/expenses_item_widget.dart';
 import '../../../categories/presentation/pages/categories_page.dart';
 import '../custom_bottom_bar.dart';
 import '../tab_item_data.dart';
 import '../../../../gen/assets.gen.dart';
 import '../../../bank_accounts/presentation/account_screen.dart';
 import '../../../../core/utils/constants.dart';
-import '../../../../injection_container.dart' as di;
 import '../../../bank_accounts/presentation/bloc/wallet_bloc.dart';
 import '../../../bank_accounts/presentation/bloc/operation_bloc.dart';
 import '../../../transactions/presentation/operation_edit_screen.dart';
 import '../../../categories/presentation/bloc/category_bloc.dart';
+import 'outcome_history_screen.dart';
+import 'income_history_screen.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -29,6 +29,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     super.initState();
     // Гарантируем, что кошельки всегда загружены
     context.read<WalletBloc>().add(LoadWallets());
+    // Гарантируем, что операции всегда загружены
+    context.read<OperationBloc>().add(LoadOperations());
   }
 
   void _editAccountTitle() async {
@@ -40,7 +42,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('SHMR Finance'),
+        title: const Text('SHMR Finance'),
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(
@@ -99,7 +101,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     return Text(state.wallets.first.name,
                         style: AppTextStyles.titleLarge);
                   }
-                  return Text('Счет', style: AppTextStyles.titleLarge);
+                  return const Text('Счет', style: AppTextStyles.titleLarge);
                 },
               )
             : Text(_tabs[_selectedTab].label, style: AppTextStyles.titleLarge),
@@ -115,9 +117,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OperationHistoryScreen(
-                          isIncome: _selectedTab == 1,
-                        ),
+                        builder: (context) => _selectedTab == 1
+                            ? IncomeHistoryScreen()
+                            : OutcomeHistoryScreen(),
                       ),
                     );
                   },
@@ -180,9 +182,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       case 1:
         return IncomeTodayList();
       case 2:
-        return AccountScreen();
+        return const AccountScreen();
       case 3:
-        return CategoriesPage();
+        return const CategoriesPage();
       case 4:
         return const Center(child: Text('Настройки'));
       default:

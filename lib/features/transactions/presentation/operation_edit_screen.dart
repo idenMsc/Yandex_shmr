@@ -1,11 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:drift/drift.dart' as drift;
-import '../../../core/utils/constants.dart';
-import '../../../l10n/app_localizations.dart';
 import '../../bank_accounts/presentation/bloc/operation_bloc.dart';
 import '../../bank_accounts/presentation/bloc/wallet_bloc.dart';
 import '../../../core/data/database.dart';
@@ -37,7 +34,6 @@ class OperationEditModal extends StatefulWidget {
 
 class _OperationEditModalState extends State<OperationEditModal> {
   WalletDbModel? _selectedWallet;
-  // Используем тот же список категорий, что и на categories_page
   final List<List<String>> _categories = [
     ['Аренда квартиры', '🏡'],
     ['Одежда', '👗'],
@@ -56,6 +52,9 @@ class _OperationEditModalState extends State<OperationEditModal> {
   @override
   void initState() {
     super.initState();
+    _amountController.addListener(() {
+      setState(() {});
+    });
     if (widget.initialOperation != null) {
       // TODO: инициализация из существующей операции
     }
@@ -99,35 +98,28 @@ class _OperationEditModalState extends State<OperationEditModal> {
   }
 
   void _selectCategory(List<Category> categories) async {
-    // Используем _categories вместо categories из Bloc
-    final selected = await showModalBottomSheet<Map<String, String>>(
+    final filtered =
+        categories.where((c) => c.isIncome == widget.isIncome).toList();
+    final selected = await showModalBottomSheet<Category>(
       context: context,
-      builder: (context) => _categories.isEmpty
+      builder: (context) => filtered.isEmpty
           ? const Center(
               child: Padding(
               padding: EdgeInsets.all(32),
               child: Text('Нет доступных категорий'),
             ))
           : ListView(
-              children: _categories
+              children: filtered
                   .map((c) => ListTile(
-                        leading: Text(c.length > 1 ? c[1] : '📂'),
-                        title: Text(c[0]),
-                        onTap: () => Navigator.pop(context, {
-                          'name': c[0],
-                          'emoji': c.length > 1 ? c[1] : '📂'
-                        }),
+                        leading: Text(c.emoji ?? '📂'),
+                        title: Text(c.name),
+                        onTap: () => Navigator.pop(context, c),
                       ))
                   .toList(),
             ),
     );
     if (selected != null) {
-      setState(() => _selectedCategory = Category(
-            id: 0, // id не используется, можно доработать если потребуется
-            name: selected['name']!,
-            emoji: selected['emoji']!,
-            isIncome: widget.isIncome,
-          ));
+      setState(() => _selectedCategory = selected);
     }
   }
 
@@ -153,18 +145,14 @@ class _OperationEditModalState extends State<OperationEditModal> {
     if (!isValid) return;
     final dt = DateTime(_selectedDate.year, _selectedDate.month,
         _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
-    // Для groupId используем 1 (доход) или 4 (расход) — как в тестовых данных
-    final groupId = widget.isIncome ? 1 : 4;
     final operation = OperationTableCompanion(
       walletId: drift.Value(_selectedWallet!.id),
-      groupId: drift.Value(groupId),
+      groupId: drift.Value(_selectedCategory!.id),
       amount: drift.Value(_amountController.text),
       operationDate: drift.Value(dt),
       comment: drift.Value(_commentController.text),
     );
     context.read<OperationBloc>().add(CreateOperation(operation));
-    // Немедленно обновляем историю
-    context.read<OperationBloc>().add(LoadOperations());
     Navigator.pop(context);
   }
 

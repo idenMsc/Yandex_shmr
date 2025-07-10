@@ -5,7 +5,6 @@ import '../../../core/utils/constants.dart';
 import '../../../l10n/app_localizations.dart';
 import 'bloc/wallet_bloc.dart';
 import 'bloc/operation_bloc.dart';
-import '../../transactions/presentation/operation_edit_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -65,35 +64,6 @@ class _AccountScreenState extends State<AccountScreen> {
     }
   }
 
-  String _getCategoryFromGroupId(int groupId, bool isIncome) {
-    if (isIncome) {
-      switch (groupId) {
-        case 1:
-          return 'Зарплата';
-        case 2:
-          return 'Подарки';
-        case 3:
-          return 'Инвестиции';
-        default:
-          return 'Другое';
-      }
-    } else {
-      switch (groupId) {
-        case 4:
-          return 'Продукты';
-        case 5:
-          return 'Транспорт';
-        case 6:
-          return 'Развлечения';
-        case 7:
-          return 'Одежда';
-        case 8:
-          return 'Здоровье';
-        default:
-          return 'Другое';
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
