@@ -11,6 +11,9 @@ import 'package:shmr_25/core/data/repositories/wallet_repository.dart';
 import 'package:shmr_25/core/data/repositories/operation_repository.dart';
 import 'package:shmr_25/features/bank_accounts/presentation/bloc/wallet_bloc.dart';
 import 'package:shmr_25/features/bank_accounts/presentation/bloc/operation_bloc.dart';
+import 'package:shmr_25/features/categories/data/datasources/category_remote_data_source.dart';
+import 'package:shmr_25/core/network_client.dart';
+import 'package:shmr_25/core/network_service.dart';
 
 final sl = GetIt.instance;
 
@@ -19,27 +22,25 @@ Future<void> init() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 
-  // Bloc
+  // Network
+  sl.registerLazySingleton(() => NetworkClient());
+  sl.registerLazySingleton(() => NetworkService(sl()));
 
-  sl.registerFactory(
-    () => CategoryBloc(getAllCategories: sl()),
+  // Data sources
+  sl.registerLazySingleton<CategoryRemoteDataSource>(
+    () => CategoryRemoteDataSource(networkService: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(remoteDataSource: sl()),
   );
 
   // UseCases
-
   sl.registerLazySingleton(() => GetAllCategories(sl()));
 
-  // Repository
-
-  sl.registerLazySingleton<CategoryRepository>(
-    () => CategoryRepositoryImpl(localDataSource: sl()),
-  );
-
-  // Data sources
-
-  sl.registerLazySingleton<CategoryLocalDataSource>(
-    () => CategoryLocalDataSourceImpl(sharedPreferences: sl()),
-  );
+  // Bloc
+  sl.registerFactory(() => CategoryBloc(getAllCategories: sl()));
 
   // Database
   final databaseService = await DatabaseService.getInstance();

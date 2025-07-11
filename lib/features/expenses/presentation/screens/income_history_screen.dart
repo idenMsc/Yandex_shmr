@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/data/database.dart';
 import '../../../bank_accounts/presentation/bloc/operation_bloc.dart';
+import '../../../bank_accounts/presentation/bloc/wallet_bloc.dart';
 import '../../../categories/presentation/bloc/category_bloc.dart';
+import '../../../transactions/presentation/transaction_details_modal.dart';
 
 class IncomeHistoryScreen extends StatefulWidget {
   const IncomeHistoryScreen({super.key});
@@ -165,6 +168,26 @@ class _IncomeHistoryScreenState extends State<IncomeHistoryScreen> {
                                   '${op.operationDate.day.toString().padLeft(2, '0')}.${op.operationDate.month.toString().padLeft(2, '0')}.${op.operationDate.year}'),
                             ],
                           ),
+                          onTap: () {
+                            final wallets = context.read<WalletBloc>().state
+                                    is WalletsLoaded
+                                ? (context.read<WalletBloc>().state
+                                        as WalletsLoaded)
+                                    .wallets
+                                : <WalletDbModel>[];
+                            final wallet = wallets.isEmpty
+                                ? null
+                                : wallets.firstWhere((w) => w.id == op.walletId,
+                                    orElse: () => wallets.first);
+                            if (cat != null && wallet != null) {
+                              TransactionDetailsModal.show(
+                                context,
+                                operation: op,
+                                category: cat,
+                                wallet: wallet,
+                              );
+                            }
+                          },
                         );
                       },
                     ),

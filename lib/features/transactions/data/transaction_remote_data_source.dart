@@ -1,49 +1,29 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import '../../../core/network_service.dart';
 import '../domain/entities/transaction.dart';
 
 class TransactionRemoteDataSource {
-  final String baseUrl;
-  final String token;
+  final NetworkService networkService;
 
-  TransactionRemoteDataSource({required this.baseUrl, required this.token});
+  TransactionRemoteDataSource({required this.networkService});
 
   Future<List<Transaction>> getTransactionsByPeriod({
     required int accountId,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
-    final url = Uri.parse(
-        '$baseUrl/transactions/account/$accountId/period?startDate=${startDate.toIso8601String().substring(0, 10)}&endDate=${endDate.toIso8601String().substring(0, 10)}');
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/jso',
-      },
-    );
-    if (response.statusCode == 200) {
-      print(response.body.toString());
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => _transactionFromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load transactions');
-    }
+    final path = '/transactions/account/$accountId/period';
+    final query = {
+      'startDate': startDate.toIso8601String().substring(0, 10),
+      'endDate': endDate.toIso8601String().substring(0, 10),
+    };
+    final data = await networkService.get<List<dynamic>>(path, query: query);
+    return data.map((json) => _transactionFromJson(json)).toList();
   }
 
   Future<void> addTransaction(Transaction transaction) async {
-    final url = Uri.parse('$baseUrl/transactions');
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(_transactionToJson(transaction)),
-    );
-    if (response.statusCode != 201) {
-      throw Exception('Failed to add transaction');
-    }
+    final path = '/transactions';
+    await networkService.post(path, data: _transactionToJson(transaction));
   }
 
   // --- JSON helpers ---
