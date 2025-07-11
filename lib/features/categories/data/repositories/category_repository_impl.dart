@@ -2,40 +2,42 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/repositories/category_repository.dart';
-import '../datasources/category_local_data_source.dart';
+import '../datasources/category_remote_data_source.dart';
 
 class CategoryRepositoryImpl implements CategoryRepository {
-  final CategoryLocalDataSource localDataSource;
+  final CategoryRemoteDataSource remoteDataSource;
 
-  CategoryRepositoryImpl({required this.localDataSource});
+  CategoryRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Either<Failure, List<Category>>> getAllCategories() async {
     try {
-      final categories = await localDataSource.getAllCategories();
+      final categories = await remoteDataSource.getAllCategories();
       return Right(categories);
     } catch (e) {
-      return Left(CacheFailure('Failed to get categories from cache'));
+      return const Left(ServerFailure('Failed to get categories from API'));
     }
   }
 
   @override
   Future<Either<Failure, List<Category>>> getIncomeCategories() async {
     try {
-      final categories = await localDataSource.getIncomeCategories();
-      return Right(categories);
+      final categories = await remoteDataSource.getAllCategories();
+      return Right(categories.where((c) => c.isIncome).toList());
     } catch (e) {
-      return Left(CacheFailure('Failed to get income categories from cache'));
+      return const Left(
+          ServerFailure('Failed to get income categories from API'));
     }
   }
 
   @override
   Future<Either<Failure, List<Category>>> getExpenseCategories() async {
     try {
-      final categories = await localDataSource.getExpenseCategories();
-      return Right(categories);
+      final categories = await remoteDataSource.getAllCategories();
+      return Right(categories.where((c) => !c.isIncome).toList());
     } catch (e) {
-      return Left(CacheFailure('Failed to get expense categories from cache'));
+      return const Left(
+          ServerFailure('Failed to get expense categories from API'));
     }
   }
 }

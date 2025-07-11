@@ -1,28 +1,16 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import '../../../core/network_service.dart';
 import '../domain/entities/account.dart';
 
 class AccountRemoteDataSource {
-  final String baseUrl;
-  final String token;
+  final NetworkService networkService;
 
-  AccountRemoteDataSource({required this.baseUrl, required this.token});
+  AccountRemoteDataSource({required this.networkService});
 
   Future<List<Account>> getAccounts() async {
-    final url = Uri.parse('$baseUrl/accounts');
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => _accountFromJson(json)).toList();
-    } else {
-      throw Exception('Failed to load accounts');
-    }
+    final path = '/accounts';
+    final data = await networkService.get<List<dynamic>>(path);
+    return data.map((json) => _accountFromJson(json)).toList();
   }
 
   Account _accountFromJson(Map<String, dynamic> json) {

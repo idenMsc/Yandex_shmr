@@ -23,7 +23,6 @@ mixin _$CategoryModel {
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get emoji => throw _privateConstructorUsedError;
-  @JsonKey(name: 'isIncome')
   bool get isIncome => throw _privateConstructorUsedError;
 
   /// Serializes this CategoryModel to a JSON map.
@@ -42,11 +41,7 @@ abstract class $CategoryModelCopyWith<$Res> {
           CategoryModel value, $Res Function(CategoryModel) then) =
       _$CategoryModelCopyWithImpl<$Res, CategoryModel>;
   @useResult
-  $Res call(
-      {int id,
-      String name,
-      String emoji,
-      @JsonKey(name: 'isIncome') bool isIncome});
+  $Res call({int id, String name, String emoji, bool isIncome});
 }
 
 /// @nodoc
@@ -98,11 +93,7 @@ abstract class _$$CategoryModelImplCopyWith<$Res>
       __$$CategoryModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {int id,
-      String name,
-      String emoji,
-      @JsonKey(name: 'isIncome') bool isIncome});
+  $Res call({int id, String name, String emoji, bool isIncome});
 }
 
 /// @nodoc
@@ -151,7 +142,7 @@ class _$CategoryModelImpl extends _CategoryModel {
       {required this.id,
       required this.name,
       required this.emoji,
-      @JsonKey(name: 'isIncome') required this.isIncome})
+      required this.isIncome})
       : super._();
 
   factory _$CategoryModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -164,7 +155,6 @@ class _$CategoryModelImpl extends _CategoryModel {
   @override
   final String emoji;
   @override
-  @JsonKey(name: 'isIncome')
   final bool isIncome;
 
   @override
@@ -206,11 +196,10 @@ class _$CategoryModelImpl extends _CategoryModel {
 
 abstract class _CategoryModel extends CategoryModel {
   const factory _CategoryModel(
-          {required final int id,
-          required final String name,
-          required final String emoji,
-          @JsonKey(name: 'isIncome') required final bool isIncome}) =
-      _$CategoryModelImpl;
+      {required final int id,
+      required final String name,
+      required final String emoji,
+      required final bool isIncome}) = _$CategoryModelImpl;
   const _CategoryModel._() : super._();
 
   factory _CategoryModel.fromJson(Map<String, dynamic> json) =
@@ -223,7 +212,6 @@ abstract class _CategoryModel extends CategoryModel {
   @override
   String get emoji;
   @override
-  @JsonKey(name: 'isIncome')
   bool get isIncome;
 
   /// Create a copy of CategoryModel

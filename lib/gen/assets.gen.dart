@@ -25,6 +25,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/more_vert.svg
   String get moreVert => 'assets/icons/more_vert.svg';
 
+  /// File path: assets/icons/plus.svg
+  String get plus => 'assets/icons/plus.svg';
+
   /// File path: assets/icons/settings.svg
   String get settings => 'assets/icons/settings.svg';
 
@@ -41,6 +44,7 @@ class $AssetsIconsGen {
     expenseStats,
     historyOutline,
     moreVert,
+    plus,
     settings,
     trendDown,
     trendUp,

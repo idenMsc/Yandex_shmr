@@ -28,6 +28,8 @@ dependencies:
   path_provider: ^2.1.5
   fuzzy: ^0.5.1
 
+  dio: ^5.8.0+1
+зарп
 dev_dependencies:
   build_runner: ^2.4.6
   freezed: ^2.4.2

@@ -1,84 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:fuzzy/fuzzy.dart';
-import 'package:shmr_25/widgets/CustomListItem.dart';
-import 'package:shmr_25/widgets/FZSearchWiget.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/category_bloc.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
   @override
-  State<CategoriesPage> createState() => CategoriesPageState();
+  State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
-class CategoriesPageState extends State<CategoriesPage> {
-  final _categories = [
-    ['Аренда квартиры', '🏡'],
-    ['Одежда', '👗'],
-    ['На собачку', '🐶'],
-    ['Ремонт квартиры'],
-    ['Продукты', '🍭'],
-    ['Спортзал', '🏋️'],
-    ['Медицина', '💊'],
-  ];
-
-  Fuzzy search = Fuzzy([]);
+class _CategoriesPageState extends State<CategoriesPage> {
   String searchQuery = "";
-
-  String searchLetters(String name) {
-    List<String> words = name.split(" ");
-    String result = words[0][0];
-    if (words.length > 1) {
-      result += words[1][0].toUpperCase();
-    }
-    return result;
-  }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-
-    var fuseList = [];
-
-    for (var category in _categories) {
-      fuseList.add(category[0]);
-    }
-
-    List searchWords =
-        Fuzzy(fuseList).search(searchQuery).map((e) => e.item).toList();
-
     return Scaffold(
-        body: Column(
-      children: [
-        FZSearchWiget(
-          onTapSearch: (text) {
-            setState(() => searchQuery = text);
-          },
-          onSearchReset: () {
-            setState(() => searchQuery = "");
-          },
-        ),
-        Expanded(
-            child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: searchWords.length,
-          itemBuilder: (builder, index) {
-            var category = _categories
-                .where((item) => item[0] == searchWords[index])
-                .first;
-            String? emoji = category.length > 1 ? category[1] : null;
-
-            return CustomListItem(
-              height: height * 0.077,
-              paddingLeft: width * 0.04,
-              paddingRight: width * 0.04,
-              title: searchWords[index],
-              wrapEmoji: true,
-              emoji: emoji,
-            );
-          },
-        ))
-      ],
-    ));
+      body: Column(
+        children: [
+          // Поисковая строка
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                filled: true,
+                fillColor: Color(0xffECE6F0),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                hintText: "Найти статью",
+                suffixIcon: Icon(
+                  Icons.search,
+                  color: Color(0xff1D1B20),
+                ),
+                border: OutlineInputBorder(borderSide: BorderSide.none),
+              ),
+              onChanged: (value) {
+                setState(() => searchQuery = value);
+              },
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<CategoryBloc, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is CategoryLoaded) {
+                  final categories = state.categories
+                      .where((c) => c.name
+                          .toLowerCase()
+                          .contains(searchQuery.toLowerCase()))
+                      .toList();
+                  if (categories.isEmpty) {
+                    return const Center(child: Text('Ничего не найдено'));
+                  }
+                  return ListView.builder(
+                    itemCount: categories.length,
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      return ListTile(
+                        leading: Text(category.emoji),
+                        title: Text(category.name),
+                        subtitle: Text(category.isIncome ? 'Доход' : 'Расход'),
+                      );
+                    },
+                  );
+                } else if (state is CategoryError) {
+                  return Center(child: Text('Ошибка: ${state.message}'));
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

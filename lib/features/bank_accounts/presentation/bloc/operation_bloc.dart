@@ -51,6 +51,15 @@ class DeleteOperation extends OperationEvent {
   List<Object?> get props => [operationId];
 }
 
+class UpdateOperation extends OperationEvent {
+  final OperationTableCompanion operation;
+
+  const UpdateOperation(this.operation);
+
+  @override
+  List<Object?> get props => [operation];
+}
+
 // Внутренние события для обновления UI
 class _OperationsUpdated extends OperationEvent {
   final List<OperationDbModel> operations;
@@ -110,6 +119,7 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
     on<LoadOperationsByDateRange>(_onLoadOperationsByDateRange);
     on<CreateOperation>(_onCreateOperation);
     on<DeleteOperation>(_onDeleteOperation);
+    on<UpdateOperation>(_onUpdateOperation);
     on<_OperationsUpdated>(_onOperationsUpdated);
   }
 
@@ -155,7 +165,8 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
     try {
       final result = await repository.createOperation(event.operation);
       if (result > 0) {
-        emit(OperationCreated());
+        // emit(OperationCreated()); // Убираем это состояние
+        // Не сбрасываем подписку, стрим сам обновит состояние
       } else {
         emit(const OperationsError('Не удалось создать операцию'));
       }
@@ -174,6 +185,21 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
         emit(OperationDeleted());
       } else {
         emit(const OperationsError('Не удалось удалить операцию'));
+      }
+    } catch (e) {
+      emit(OperationsError(e.toString()));
+    }
+  }
+
+  Future<void> _onUpdateOperation(
+      UpdateOperation event, Emitter<OperationState> emit) async {
+    emit(OperationCreating());
+    try {
+      final result = await repository.updateOperation(event.operation);
+      if (result) {
+        // emit(OperationCreated()); // Не сбрасываем подписку, стрим сам обновит состояние
+      } else {
+        emit(const OperationsError('Не удалось обновить операцию'));
       }
     } catch (e) {
       emit(OperationsError(e.toString()));

@@ -24,7 +24,7 @@ class _FZSearchWigetState extends State<FZSearchWiget> {
     double width = MediaQuery.of(context).size.width;
     return Container (
       height: height * 0.062,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border (
           bottom: BorderSide(color: Color.fromRGBO(202, 196, 208, 1)),
         ),
@@ -41,11 +41,11 @@ class _FZSearchWigetState extends State<FZSearchWiget> {
               maxLines: 1,
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderSide: BorderSide.none),
-                border: OutlineInputBorder(borderSide: BorderSide.none),
+                enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                focusedBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                border: const OutlineInputBorder(borderSide: BorderSide.none),
                 hintText: "Найти статью",
-                suffixIcon: Icon(
+                suffixIcon: const Icon(
                   Icons.search_outlined,
                   color: Color.fromRGBO(73, 60, 75, 1),
                 ),
