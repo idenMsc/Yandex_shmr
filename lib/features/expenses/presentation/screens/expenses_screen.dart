@@ -17,6 +17,7 @@ import 'income_history_screen.dart';
 import '../../../transactions/transaction_bloc.dart';
 import '../../../transactions/transaction_state.dart';
 import '../../../transactions/transaction_event.dart';
+import 'package:shmr_25/widgets/offline_indicator.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});

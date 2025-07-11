@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/data/database.dart';
 import '../../../../core/data/repositories/operation_repository.dart';
+import '../../../../core/error/global_ui_bloc.dart';
+import '../../../../injection_container.dart';
 
 // События
 abstract class OperationEvent extends Equatable {
@@ -125,41 +127,66 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
 
   Future<void> _onLoadOperations(
       LoadOperations event, Emitter<OperationState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(OperationsLoading());
 
     await _operationsSubscription?.cancel();
     _operationsSubscription = repository.getAllOperations().listen(
-          (operations) => add(_OperationsUpdated(operations)),
-          onError: (error) => emit(OperationsError(error.toString())),
-        );
+      (operations) {
+        add(_OperationsUpdated(operations));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+      onError: (error) {
+        sl<GlobalUiBloc>().add(ShowError(error.toString()));
+        emit(OperationsError(error.toString()));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+    );
   }
 
   Future<void> _onLoadOperationsByWallet(
       LoadOperationsByWallet event, Emitter<OperationState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(OperationsLoading());
 
     await _operationsSubscription?.cancel();
     _operationsSubscription =
         repository.getOperationsByWallet(event.walletId).listen(
-              (operations) => add(_OperationsUpdated(operations)),
-              onError: (error) => emit(OperationsError(error.toString())),
-            );
+      (operations) {
+        add(_OperationsUpdated(operations));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+      onError: (error) {
+        sl<GlobalUiBloc>().add(ShowError(error.toString()));
+        emit(OperationsError(error.toString()));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+    );
   }
 
   Future<void> _onLoadOperationsByDateRange(
       LoadOperationsByDateRange event, Emitter<OperationState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(OperationsLoading());
 
     await _operationsSubscription?.cancel();
     _operationsSubscription =
         repository.getOperationsByDateRange(event.start, event.end).listen(
-              (operations) => add(_OperationsUpdated(operations)),
-              onError: (error) => emit(OperationsError(error.toString())),
-            );
+      (operations) {
+        add(_OperationsUpdated(operations));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+      onError: (error) {
+        sl<GlobalUiBloc>().add(ShowError(error.toString()));
+        emit(OperationsError(error.toString()));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+    );
   }
 
   Future<void> _onCreateOperation(
       CreateOperation event, Emitter<OperationState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(OperationCreating());
 
     try {
@@ -168,15 +195,20 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
         // emit(OperationCreated()); // Убираем это состояние
         // Не сбрасываем подписку, стрим сам обновит состояние
       } else {
+        sl<GlobalUiBloc>().add(ShowError('Не удалось создать операцию'));
         emit(const OperationsError('Не удалось создать операцию'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(OperationsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 
   Future<void> _onDeleteOperation(
       DeleteOperation event, Emitter<OperationState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(OperationDeleting());
 
     try {
@@ -184,25 +216,33 @@ class OperationBloc extends Bloc<OperationEvent, OperationState> {
       if (result > 0) {
         emit(OperationDeleted());
       } else {
+        sl<GlobalUiBloc>().add(ShowError('Не удалось удалить операцию'));
         emit(const OperationsError('Не удалось удалить операцию'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(OperationsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 
   Future<void> _onUpdateOperation(
       UpdateOperation event, Emitter<OperationState> emit) async {
-    emit(OperationCreating());
+    sl<GlobalUiBloc>().add(ShowLoading());
     try {
       final result = await repository.updateOperation(event.operation);
       if (result) {
         // emit(OperationCreated()); // Не сбрасываем подписку, стрим сам обновит состояние
       } else {
+        sl<GlobalUiBloc>().add(ShowError('Не удалось обновить операцию'));
         emit(const OperationsError('Не удалось обновить операцию'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(OperationsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 

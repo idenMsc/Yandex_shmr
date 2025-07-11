@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/data/database.dart';
 import '../../../../core/data/repositories/wallet_repository.dart';
+import '../../../../core/error/global_ui_bloc.dart';
+import '../../../../injection_container.dart';
 
 // События
 abstract class WalletEvent extends Equatable {
@@ -103,17 +105,26 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
   Future<void> _onLoadWallets(
       LoadWallets event, Emitter<WalletState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(WalletsLoading());
 
     await _walletsSubscription?.cancel();
     _walletsSubscription = repository.getAllWallets().listen(
-          (wallets) => add(_WalletsUpdated(wallets)),
-          onError: (error) => emit(WalletsError(error.toString())),
-        );
+      (wallets) {
+        add(_WalletsUpdated(wallets));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+      onError: (error) {
+        sl<GlobalUiBloc>().add(ShowError(error.toString()));
+        emit(WalletsError(error.toString()));
+        sl<GlobalUiBloc>().add(HideLoading());
+      },
+    );
   }
 
   Future<void> _onUpdateWalletName(
       UpdateWalletName event, Emitter<WalletState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(WalletUpdating());
 
     try {
@@ -121,15 +132,21 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       if (result > 0) {
         emit(WalletUpdated());
       } else {
+        sl<GlobalUiBloc>()
+            .add(ShowError('Не удалось обновить название кошелька'));
         emit(const WalletsError('Не удалось обновить название кошелька'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(WalletsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 
   Future<void> _onUpdateWalletBalance(
       UpdateWalletBalance event, Emitter<WalletState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(WalletUpdating());
 
     try {
@@ -138,15 +155,20 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       if (result > 0) {
         emit(WalletUpdated());
       } else {
+        sl<GlobalUiBloc>().add(ShowError('Не удалось обновить баланс'));
         emit(const WalletsError('Не удалось обновить баланс'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(WalletsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 
   Future<void> _onUpdateWalletCurrency(
       UpdateWalletCurrency event, Emitter<WalletState> emit) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(WalletUpdating());
 
     try {
@@ -155,10 +177,14 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       if (result > 0) {
         emit(WalletUpdated());
       } else {
+        sl<GlobalUiBloc>().add(ShowError('Не удалось обновить валюту'));
         emit(const WalletsError('Не удалось обновить валюту'));
       }
     } catch (e) {
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(WalletsError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 

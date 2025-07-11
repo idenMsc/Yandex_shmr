@@ -8,10 +8,15 @@ import 'features/categories/presentation/bloc/category_bloc.dart';
 import 'features/transactions/transaction_bloc.dart';
 import 'l10n/app_localizations.dart';
 import 'injection_container.dart' as di;
+import 'features/categories/data/datasources/category_remote_data_source.dart';
+import 'features/transactions/data/account_remote_data_source.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init(); // Инициализация базы данных и DI
+  // Прогреваем кэш категорий и счетов
+  di.sl<CategoryRemoteDataSource>().getAllCategories().catchError((_) {});
+  di.sl<AccountRemoteDataSource>().getAccounts().catchError((_) {});
   runApp(const FinanceApp());
 }
 

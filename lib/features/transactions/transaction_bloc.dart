@@ -3,6 +3,8 @@ import 'data/transaction_repository_impl.dart';
 import 'data/account_remote_data_source.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
+import '../../../core/error/global_ui_bloc.dart';
+import '../../../injection_container.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final TransactionRepositoryImpl transactionRepository;
@@ -21,24 +23,27 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     CreateTransactionEvent event,
     Emitter<TransactionState> emit,
   ) async {
-    print('TransactionBloc: создание транзакции');
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(TransactionCreating());
     try {
       final result =
           await transactionRepository.addTransaction(event.transaction);
       result.fold(
-        (failure) => emit(TransactionError(failure.message)),
+        (failure) {
+          sl<GlobalUiBloc>().add(ShowError(failure.message));
+          emit(TransactionError(failure.message));
+        },
         (_) {
-          print('TransactionBloc: транзакция создана успешно');
           emit(TransactionCreated());
-          // Перезагружаем список транзакций
           add(LoadTransactionsEvent(
               isIncome: event.transaction.category.isIncome));
         },
       );
     } catch (e) {
-      print('TransactionBloc: ошибка создания транзакции: $e');
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(TransactionError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 
@@ -51,24 +56,19 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     LoadTransactionsEvent event,
     Emitter<TransactionState> emit,
   ) async {
-    print(
-        'TransactionBloc._onLoadTransactions: загружаем ${event.isIncome ? "доходы" : "расходы"}');
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(TransactionLoading());
     try {
       final accounts = await accountRemoteDataSource.getAccounts();
-      print('TransactionBloc: получено ${accounts.length} счетов с сервера');
       if (accounts.isEmpty) {
-        print('TransactionBloc: нет счетов на сервере');
+        sl<GlobalUiBloc>().add(ShowError('Нет счетов'));
         emit(const TransactionError('Нет счетов'));
         return;
       }
       final accountId = accounts.first.id;
-      print('TransactionBloc: используем accountId=$accountId');
       final today = DateTime.now();
-      // Используем UTC для консистентности с сервером
       final start = DateTime.utc(today.year, today.month, today.day);
       final end = DateTime.utc(today.year, today.month, today.day, 23, 59, 59);
-      print('TransactionBloc: период $start - $end');
       final result = await transactionRepository.getTransactionsByPeriod(
         accountId: accountId,
         startDate: start,
@@ -76,27 +76,22 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       );
       result.fold(
         (failure) {
-          print(
-              'TransactionBloc: ошибка загрузки транзакций: ${failure.message}');
+          sl<GlobalUiBloc>().add(ShowError(failure.message));
           emit(TransactionError(failure.message));
         },
         (transactions) {
-          print('TransactionBloc: получено ${transactions.length} транзакций');
-          for (final t in transactions) {
-            print(
-                'Транзакция: ID=${t.id}, amount=${t.amount}, date=${t.transactionDate}, isIncome=${t.category.isIncome}');
-          }
           final filtered = transactions
               .where((t) => t.category.isIncome == event.isIncome)
               .toList();
-          print('TransactionBloc: отфильтровано ${filtered.length} транзакций');
           final total = filtered.fold<double>(0, (sum, t) => sum + t.amount);
           emit(TransactionLoaded(transactions: filtered, total: total));
         },
       );
     } catch (e) {
-      print('TransactionBloc: исключение: $e');
+      sl<GlobalUiBloc>().add(ShowError(e.toString()));
       emit(TransactionError(e.toString()));
+    } finally {
+      sl<GlobalUiBloc>().add(HideLoading());
     }
   }
 }
