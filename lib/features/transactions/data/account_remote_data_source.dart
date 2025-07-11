@@ -9,8 +9,16 @@ class AccountRemoteDataSource {
 
   Future<List<Account>> getAccounts() async {
     final path = '/accounts';
+    print('AccountRemoteDataSource.getAccounts: запрашиваем $path');
     final data = await networkService.get<List<dynamic>>(path);
-    return data.map((json) => _accountFromJson(json)).toList();
+    print(
+        'AccountRemoteDataSource.getAccounts: получено ${data.length} счетов');
+    final accounts = data.map((json) => _accountFromJson(json)).toList();
+    for (final account in accounts) {
+      print(
+          'Счет: ID=${account.id}, name=${account.name}, balance=${account.balance}');
+    }
+    return accounts;
   }
 
   Account _accountFromJson(Map<String, dynamic> json) {

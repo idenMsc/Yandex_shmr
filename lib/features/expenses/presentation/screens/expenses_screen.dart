@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../categories/presentation/pages/categories_page.dart';
+import '../../../transactions/presentation/transaction_create_modal.dart';
 import '../custom_bottom_bar.dart';
 import '../tab_item_data.dart';
 import '../../../../gen/assets.gen.dart';
@@ -13,6 +14,9 @@ import '../../../transactions/presentation/operation_edit_screen.dart';
 import '../../../categories/presentation/bloc/category_bloc.dart';
 import 'outcome_history_screen.dart';
 import 'income_history_screen.dart';
+import '../../../transactions/transaction_bloc.dart';
+import '../../../transactions/transaction_state.dart';
+import '../../../transactions/transaction_event.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -155,7 +159,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               focusElevation: 0,
               highlightElevation: 0,
               disabledElevation: 0,
-              onPressed: () => OperationEditModal.show(
+              onPressed: () => TransactionCreateModal.show(
                 context,
                 isIncome: _selectedTab == 1,
               ),
@@ -170,6 +174,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           setState(() {
             _selectedTab = index;
           });
+          // Перезагружаем транзакции при переключении табов
+          if (index == 0) {
+            context
+                .read<TransactionBloc>()
+                .add(LoadTransactionsEvent(isIncome: false));
+          } else if (index == 1) {
+            context
+                .read<TransactionBloc>()
+                .add(LoadTransactionsEvent(isIncome: true));
+          }
         },
       ),
     );
@@ -194,101 +208,95 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 }
 
 // Добавляю виджеты для отображения операций за сегодня
-class ExpensesTodayList extends StatelessWidget {
+class ExpensesTodayList extends StatefulWidget {
+  @override
+  State<ExpensesTodayList> createState() => _ExpensesTodayListState();
+}
+
+class _ExpensesTodayListState extends State<ExpensesTodayList> {
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем транзакции при инициализации
+    context.read<TransactionBloc>().add(LoadTransactionsEvent(isIncome: false));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OperationBloc, OperationState>(
+    return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
-        return BlocBuilder<CategoryBloc, CategoryState>(
-          builder: (context, catState) {
-            if (state is OperationsLoading || catState is CategoryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is OperationsLoaded &&
-                catState is CategoryLoaded) {
-              final categories = {for (var c in catState.categories) c.id: c};
-              final today = DateTime.now();
-              final todayOps = state.operations.where((op) {
-                final d = op.operationDate;
-                final cat = categories[op.groupId];
-                return cat != null &&
-                    !cat.isIncome &&
-                    d.year == today.year &&
-                    d.month == today.month &&
-                    d.day == today.day;
-              }).toList();
-              if (todayOps.isEmpty) {
-                return const Center(child: Text('Нет расходов за сегодня'));
-              }
-              return ListView.separated(
-                itemCount: todayOps.length,
-                separatorBuilder: (_, __) => const Divider(),
-                itemBuilder: (context, i) {
-                  final op = todayOps[i];
-                  return ListTile(
-                    leading: const Icon(Icons.trending_down),
-                    title: Text(op.amount),
-                    subtitle: Text(op.comment ?? ''),
-                    trailing: Text(
-                        '${op.operationDate.hour.toString().padLeft(2, '0')}:${op.operationDate.minute.toString().padLeft(2, '0')}'),
-                  );
-                },
+        if (state is TransactionLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is TransactionLoaded) {
+          if (state.transactions.isEmpty) {
+            return const Center(child: Text('Нет расходов за сегодня'));
+          }
+          return ListView.separated(
+            itemCount: state.transactions.length,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (context, i) {
+              final transaction = state.transactions[i];
+              return ListTile(
+                leading: Text(transaction.category.emoji,
+                    style: const TextStyle(fontSize: 24)),
+                title: Text(transaction.amount.toStringAsFixed(2)),
+                subtitle: Text(transaction.comment ?? ''),
+                trailing: Text(
+                    '${transaction.transactionDate.hour.toString().padLeft(2, '0')}:${transaction.transactionDate.minute.toString().padLeft(2, '0')}'),
               );
-            } else if (state is OperationsError) {
-              return Center(child: Text('Ошибка: ${state.message}'));
-            }
-            return const SizedBox.shrink();
-          },
-        );
+            },
+          );
+        } else if (state is TransactionError) {
+          return Center(child: Text('Ошибка: ${state.message}'));
+        }
+        return const SizedBox.shrink();
       },
     );
   }
 }
 
-class IncomeTodayList extends StatelessWidget {
+class IncomeTodayList extends StatefulWidget {
+  @override
+  State<IncomeTodayList> createState() => _IncomeTodayListState();
+}
+
+class _IncomeTodayListState extends State<IncomeTodayList> {
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем транзакции при инициализации
+    context.read<TransactionBloc>().add(LoadTransactionsEvent(isIncome: true));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OperationBloc, OperationState>(
+    return BlocBuilder<TransactionBloc, TransactionState>(
       builder: (context, state) {
-        return BlocBuilder<CategoryBloc, CategoryState>(
-          builder: (context, catState) {
-            if (state is OperationsLoading || catState is CategoryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is OperationsLoaded &&
-                catState is CategoryLoaded) {
-              final categories = {for (var c in catState.categories) c.id: c};
-              final today = DateTime.now();
-              final todayOps = state.operations.where((op) {
-                final d = op.operationDate;
-                final cat = categories[op.groupId];
-                return cat != null &&
-                    cat.isIncome &&
-                    d.year == today.year &&
-                    d.month == today.month &&
-                    d.day == today.day;
-              }).toList();
-              if (todayOps.isEmpty) {
-                return const Center(child: Text('Нет доходов за сегодня'));
-              }
-              return ListView.separated(
-                itemCount: todayOps.length,
-                separatorBuilder: (_, __) => const Divider(),
-                itemBuilder: (context, i) {
-                  final op = todayOps[i];
-                  return ListTile(
-                    leading: const Icon(Icons.trending_up),
-                    title: Text(op.amount),
-                    subtitle: Text(op.comment ?? ''),
-                    trailing: Text(
-                        '${op.operationDate.hour.toString().padLeft(2, '0')}:${op.operationDate.minute.toString().padLeft(2, '0')}'),
-                  );
-                },
+        if (state is TransactionLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is TransactionLoaded) {
+          if (state.transactions.isEmpty) {
+            return const Center(child: Text('Нет доходов за сегодня'));
+          }
+          return ListView.separated(
+            itemCount: state.transactions.length,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (context, i) {
+              final transaction = state.transactions[i];
+              return ListTile(
+                leading: Text(transaction.category.emoji,
+                    style: const TextStyle(fontSize: 24)),
+                title: Text(transaction.amount.toStringAsFixed(2)),
+                subtitle: Text(transaction.comment ?? ''),
+                trailing: Text(
+                    '${transaction.transactionDate.hour.toString().padLeft(2, '0')}:${transaction.transactionDate.minute.toString().padLeft(2, '0')}'),
               );
-            } else if (state is OperationsError) {
-              return Center(child: Text('Ошибка: ${state.message}'));
-            }
-            return const SizedBox.shrink();
-          },
-        );
+            },
+          );
+        } else if (state is TransactionError) {
+          return Center(child: Text('Ошибка: ${state.message}'));
+        }
+        return const SizedBox.shrink();
       },
     );
   }

@@ -5,6 +5,7 @@ import 'package:shmr_25/features/expenses/presentation/screens/expenses_screen.d
 import 'features/bank_accounts/presentation/bloc/wallet_bloc.dart';
 import 'features/bank_accounts/presentation/bloc/operation_bloc.dart';
 import 'features/categories/presentation/bloc/category_bloc.dart';
+import 'features/transactions/transaction_bloc.dart';
 import 'l10n/app_localizations.dart';
 import 'injection_container.dart' as di;
 
@@ -29,6 +30,9 @@ class FinanceApp extends StatelessWidget {
         ),
         BlocProvider<CategoryBloc>(
           create: (context) => di.sl<CategoryBloc>()..add(LoadCategories()),
+        ),
+        BlocProvider<TransactionBloc>(
+          create: (context) => di.sl<TransactionBloc>(),
         ),
       ],
       child: MaterialApp(

@@ -12,6 +12,10 @@ class TransactionInitial extends TransactionState {}
 
 class TransactionLoading extends TransactionState {}
 
+class TransactionCreating extends TransactionState {}
+
+class TransactionCreated extends TransactionState {}
+
 class TransactionLoaded extends TransactionState {
   final List<Transaction> transactions;
   final double total;
