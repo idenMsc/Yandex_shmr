@@ -10,9 +10,11 @@ import 'l10n/app_localizations.dart';
 import 'injection_container.dart' as di;
 import 'features/categories/data/datasources/category_remote_data_source.dart';
 import 'features/transactions/data/account_remote_data_source.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await workerManager.init(); // инициализация пула изолятов
   await di.init(); // Инициализация базы данных и DI
   // Прогреваем кэш категорий и счетов
   di.sl<CategoryRemoteDataSource>().getAllCategories().catchError((_) {});
