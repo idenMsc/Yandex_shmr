@@ -9,7 +9,6 @@ class CategoryLocalDataSourceImpl implements CategoryLocalDataSource {
 
   @override
   Future<List<Category>> getAllCategories() async {
-    // Дефолтные категории по аналогии с fin_tamer
     return [
       Category(id: 1, name: 'Зарплата', emoji: '💰', isIncome: true),
       Category(id: 2, name: 'Аренда квартиры', emoji: '🛕', isIncome: false),
