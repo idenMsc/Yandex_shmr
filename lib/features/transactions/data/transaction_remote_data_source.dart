@@ -23,7 +23,15 @@ class TransactionRemoteDataSource {
 
   Future<void> addTransaction(Transaction transaction) async {
     final path = '/transactions';
-    await networkService.post(path, data: _transactionToJson(transaction));
+    final data = _transactionToJson(transaction);
+    print('POST /transactions: $data');
+    try {
+      await networkService.post(path, data: data);
+      print('Транзакция успешно отправлена!');
+    } catch (e) {
+      print('Ошибка при отправке транзакции: $e');
+      rethrow;
+    }
   }
 
   // --- JSON helpers ---

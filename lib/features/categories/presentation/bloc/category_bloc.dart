@@ -5,6 +5,8 @@ import 'package:shmr_25/core/error/failures.dart';
 import 'package:shmr_25/core/usecases/usecase.dart';
 import 'package:shmr_25/features/categories/domain/entities/category.dart';
 import 'package:shmr_25/features/categories/domain/usecases/get_all_categories.dart';
+import '../../../../core/error/global_ui_bloc.dart';
+import '../../../../injection_container.dart';
 
 part 'category_event.dart';
 part 'category_state.dart';
@@ -20,13 +22,17 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     LoadCategories event,
     Emitter<CategoryState> emit,
   ) async {
+    sl<GlobalUiBloc>().add(ShowLoading());
     emit(CategoryLoading());
-    final Either<Failure, List<Category>> result =
-        await getAllCategories(NoParams());
+    final result = await getAllCategories(NoParams());
     result.fold(
-      (failure) => emit(CategoryError(message: _mapFailureToMessage(failure))),
+      (failure) {
+        sl<GlobalUiBloc>().add(ShowError(_mapFailureToMessage(failure)));
+        emit(CategoryError(message: _mapFailureToMessage(failure)));
+      },
       (categories) => emit(CategoryLoaded(categories: categories)),
     );
+    sl<GlobalUiBloc>().add(HideLoading());
   }
 
   String _mapFailureToMessage(Failure failure) {

@@ -1,44 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'features/expenses/presentation/screens/expenses_screen.dart';
-import 'features/transactions/transaction_bloc.dart';
-import 'features/transactions/data/transaction_repository_impl.dart';
-import 'core/network_client.dart';
-import 'core/network_service.dart';
-import 'features/transactions/data/account_remote_data_source.dart';
-import 'features/transactions/data/transaction_remote_data_source.dart';
+import 'core/error/global_ui_bloc.dart';
+import 'core/network/connection_status_bloc.dart';
+import 'widgets/offline_indicator.dart';
+import 'injection_container.dart';
+// ... остальные импорты ...
 
-class FinanceApp extends StatelessWidget {
-  const FinanceApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final networkClient = NetworkClient();
-    final networkService = NetworkService(networkClient);
-
-    final accountRemoteDataSource =
-        AccountRemoteDataSource(networkService: networkService);
-    final transactionRemoteDataSource =
-        TransactionRemoteDataSource(networkService: networkService);
-    final transactionRepository = TransactionRepositoryImpl(
-        remoteDataSource: transactionRemoteDataSource);
-
     return MultiBlocProvider(
       providers: [
-        BlocProvider<TransactionBloc>(
-          create: (context) => TransactionBloc(
-            transactionRepository: transactionRepository,
-            accountRemoteDataSource: accountRemoteDataSource,
-          ),
-        ),
+        BlocProvider<GlobalUiBloc>(create: (_) => sl<GlobalUiBloc>()),
+        BlocProvider<ConnectionStatusBloc>(
+            create: (_) => sl<ConnectionStatusBloc>()),
+        // ... другие BlocProvider ...
       ],
-      child: MaterialApp(
-        title: 'SHMR Finance',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-          scaffoldBackgroundColor: Colors.white,
+      child: BlocListener<GlobalUiBloc, GlobalUiState>(
+        listener: (context, state) {
+          if (state.errorMessage != null) {
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Ошибка'),
+                content: Text(state.errorMessage!),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      context.read<GlobalUiBloc>().add(ClearError());
+                    },
+                    child: const Text('ОК'),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
+        child: Stack(
+          children: [
+            MaterialApp(
+                // ... существующие параметры ...
+                ),
+            // Оффлайн индикатор поверх всего
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: OfflineIndicator(),
+            ),
+            // Глобальный лоадер
+            BlocBuilder<GlobalUiBloc, GlobalUiState>(
+              builder: (context, state) {
+                if (state.isLoading) {
+                  return Container(
+                    color: Colors.black.withOpacity(0.3),
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ],
         ),
-        home: const ExpensesScreen(),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'network_retry_interceptor.dart';
 import 'network_config.dart';
+import 'network_deserialize_interceptor.dart';
 
 class NetworkClient {
   late final Dio _dio;
@@ -24,6 +25,7 @@ class NetworkClient {
 
   void _setupInterceptors() {
     _dio.interceptors.add(NetworkRetryInterceptor());
+    _dio.interceptors.add(NetworkDeserializeInterceptor());
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
