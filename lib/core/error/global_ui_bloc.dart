@@ -41,24 +41,24 @@ class GlobalUiBloc extends Bloc<GlobalUiEvent, GlobalUiState> {
   Timer? _loadingTimer;
 
   GlobalUiBloc() : super(const GlobalUiState()) {
-    on<ShowLoading>((event, emit) {
+    on<ShowLoading>((event, emit) async {
       _loadingTimer?.cancel();
       emit(state.copyWith(isLoading: true));
     });
 
-    on<HideLoading>((event, emit) {
+    on<HideLoading>((event, emit) async {
       _loadingTimer?.cancel();
       _loadingTimer = Timer(const Duration(milliseconds: 500), () {
-        emit(state.copyWith(isLoading: false));
+        if (!emit.isDone) emit(state.copyWith(isLoading: false));
       });
     });
 
-    on<ShowError>((event, emit) {
+    on<ShowError>((event, emit) async {
       _loadingTimer?.cancel();
       emit(state.copyWith(errorMessage: event.message, isLoading: false));
     });
 
-    on<ClearError>((event, emit) {
+    on<ClearError>((event, emit) async {
       emit(state.copyWith(errorMessage: null));
     });
   }

@@ -52,7 +52,9 @@ class ConnectionStatusBloc
       : _connectionChecker = connectionChecker ?? InternetConnectionChecker(),
         super(const ConnectionStatusState()) {
     on<CheckConnectionStatus>(_onCheckConnectionStatus);
-    on<SetOfflineMode>(_onSetOfflineMode);
+    on<SetOfflineMode>((event, emit) async {
+      emit(state.copyWith(isOfflineMode: event.isOffline));
+    });
 
     // Начинаем мониторинг соединения
     _startConnectionMonitoring();

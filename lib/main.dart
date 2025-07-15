@@ -11,6 +11,7 @@ import 'injection_container.dart' as di;
 import 'features/categories/data/datasources/category_remote_data_source.dart';
 import 'features/transactions/data/account_remote_data_source.dart';
 import 'package:worker_manager/worker_manager.dart';
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,24 +43,50 @@ class FinanceApp extends StatelessWidget {
           create: (context) => di.sl<TransactionBloc>(),
         ),
       ],
-      child: MaterialApp(
-        title: 'SHMR Finance',
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-          scaffoldBackgroundColor: Colors.white,
-        ),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'),
-          Locale('ru'),
-        ],
-        home: const ExpensesScreen(),
+      child: const _AppWithSplash(),
+    );
+  }
+}
+
+class _AppWithSplash extends StatefulWidget {
+  const _AppWithSplash({Key? key}) : super(key: key);
+
+  @override
+  State<_AppWithSplash> createState() => _AppWithSplashState();
+}
+
+class _AppWithSplashState extends State<_AppWithSplash> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _showSplash = false;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SHMR Finance',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        scaffoldBackgroundColor: Colors.white,
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+      ],
+      home: _showSplash ? const SplashScreen() : const ExpensesScreen(),
     );
   }
 }
