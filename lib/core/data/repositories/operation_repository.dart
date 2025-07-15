@@ -56,4 +56,17 @@ class OperationRepository {
           ..where((o) => o.groupId.equals(groupId)))
         .watch();
   }
+
+  /// Удалить все операции
+  Future<void> deleteAllOperations() async {
+    await _database.delete(_database.operationTable).go();
+  }
+
+  /// Массово вставить операции
+  Future<void> insertOperations(
+      List<OperationTableCompanion> operations) async {
+    await _database.batch((batch) {
+      batch.insertAll(_database.operationTable, operations);
+    });
+  }
 }

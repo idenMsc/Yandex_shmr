@@ -45,6 +45,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/onboarding/
     - assets/icons/
   generate: true
 

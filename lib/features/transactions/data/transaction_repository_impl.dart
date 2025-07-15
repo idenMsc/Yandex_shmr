@@ -8,6 +8,10 @@ import 'package:shmr_25/core/data/backup_repository.dart';
 import 'package:shmr_25/core/connection_watcher.dart';
 import '../../../core/network/connection_status_bloc.dart' as network;
 import '../../../injection_container.dart';
+import 'package:shmr_25/core/data/database_service.dart';
+import 'package:shmr_25/core/data/repositories/operation_repository.dart';
+import 'package:drift/drift.dart';
+import '../../../core/data/database.dart';
 
 class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionRemoteDataSource remoteDataSource;
@@ -29,39 +33,84 @@ class TransactionRepositoryImpl implements TransactionRepository {
     required DateTime endDate,
   }) async {
     try {
-      // Сначала пытаемся синхронизировать pending операции
       if (connectionWatcher.status == ConnectionStatus.online) {
-        print(
-            '[TransactionRepository] Syncing pending operations before fetching');
         await syncService.syncPendingOperations();
       }
 
+      final dbService = await DatabaseService.getInstance();
+      final opRepo = dbService.operationRepository;
+
       if (connectionWatcher.status == ConnectionStatus.online) {
-        print('[TransactionRepository] Online: loading from server');
         final transactions = await remoteDataSource.getTransactionsByPeriod(
           accountId: accountId,
           startDate: startDate,
           endDate: endDate,
         );
-        sl<network.ConnectionStatusBloc>().add(network.SetOfflineMode(false));
-        return Right(transactions);
-      } else {
-        print('[TransactionRepository] Offline: loading from backup');
-        final allOps = await backupRepository.getAll();
-        final filtered = allOps
-            .where((op) =>
-                op.transaction.account.id == accountId &&
-                op.transaction.transactionDate
-                    .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
-                op.transaction.transactionDate
-                    .isBefore(endDate.add(const Duration(seconds: 1))))
+        // Обновляем локальную базу
+        await opRepo.deleteAllOperations();
+        await opRepo.insertOperations(transactions
+            .map((t) => OperationTableCompanion(
+                  apiId: Value(t.id),
+                  walletId: Value(t.account.id),
+                  groupId: Value(t.category.id),
+                  amount: Value(t.amount.toString()),
+                  operationDate: Value(t.transactionDate),
+                  comment: Value(t.comment ?? ''),
+                ))
+            .toList());
+        // Получаем pending транзакции из backup
+        final pendingOps = await backupRepository.getAll();
+        final pendingTransactions = pendingOps
+            .where((op) => op.type == SyncActionType.create)
             .map((op) => op.transaction)
+            .where((t) => !transactions.any((lt) => lt.id == t.id))
             .toList();
+        final allTransactions = [...transactions, ...pendingTransactions];
+        sl<network.ConnectionStatusBloc>().add(network.SetOfflineMode(false));
+        return Right(allTransactions);
+      } else {
+        // Оффлайн: читаем из локальной базы
+        final allOps = await opRepo.getAllOperations().first;
+        final localTransactions = allOps
+            .where((op) =>
+                op.walletId == accountId &&
+                op.operationDate
+                    .isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+                op.operationDate
+                    .isBefore(endDate.add(const Duration(seconds: 1))))
+            .map((op) => Transaction(
+                  id: op.apiId ?? op.id,
+                  account: AccountBrief(
+                    id: op.walletId,
+                    name: '',
+                    balance: 0.0,
+                    currency: '',
+                  ),
+                  category: Category(
+                    id: op.groupId,
+                    name: '',
+                    emoji: '',
+                    isIncome: false,
+                  ),
+                  amount: double.tryParse(op.amount) ?? 0.0,
+                  transactionDate: op.operationDate,
+                  comment: op.comment,
+                  createdAt: op.operationDate,
+                  updatedAt: op.operationDate,
+                ))
+            .toList();
+        // Получаем pending транзакции из backup
+        final pendingOps = await backupRepository.getAll();
+        final pendingTransactions = pendingOps
+            .where((op) => op.type == SyncActionType.create)
+            .map((op) => op.transaction)
+            .where((t) => !localTransactions.any((lt) => lt.id == t.id))
+            .toList();
+        final allTransactions = [...localTransactions, ...pendingTransactions];
         sl<network.ConnectionStatusBloc>().add(network.SetOfflineMode(true));
-        return Right(filtered);
+        return Right(allTransactions);
       }
     } catch (e) {
-      print('[TransactionRepository] Error loading transactions: $e');
       sl<network.ConnectionStatusBloc>().add(network.SetOfflineMode(true));
       return Left(ServerFailure(e.toString()));
     }
@@ -71,7 +120,18 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<Either<Failure, void>> addTransaction(Transaction transaction) async {
     print('[TransactionRepository] Adding transaction: ${transaction.id}');
     try {
-      // Сначала сохраняем локально в backup
+      final dbService = await DatabaseService.getInstance();
+      final opRepo = dbService.operationRepository;
+      // Сохраняем в локальную базу
+      await opRepo.createOperation(OperationTableCompanion(
+        apiId: Value(transaction.id),
+        walletId: Value(transaction.account.id),
+        groupId: Value(transaction.category.id),
+        amount: Value(transaction.amount.toString()),
+        operationDate: Value(transaction.transactionDate),
+        comment: Value(transaction.comment ?? ''),
+      ));
+      // Сохраняем в backup
       await backupRepository.addOrReplace(
         SyncOperation(
           type: SyncActionType.create,
@@ -79,14 +139,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
           createdAt: DateTime.now(),
         ),
       );
-      print('[TransactionRepository] Transaction saved to backup');
-
-      // Если есть интернет, пытаемся синхронизировать
       if (connectionWatcher.status == ConnectionStatus.online) {
-        print('[TransactionRepository] Online: syncing to server');
         await remoteDataSource.addTransaction(transaction);
-
-        // Удаляем из backup после успешной синхронизации
         await backupRepository.removeByUniqueKey(
             '${SyncActionType.create.name}_${transaction.id}');
         print(
