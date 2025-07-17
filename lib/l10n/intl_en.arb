@@ -8,5 +8,14 @@
   "total": "Total",
   "errorAccountNotFound": "Sorry, an error occurred, account not found",
   "noTransactions": "No transaction information available",
-  "decimalSeparator": "."
+  "decimalSeparator": ".",
+  "settings": "Settings",
+  "darkTheme": "Dark theme",
+  "mainColor": "Main color",
+  "sounds": "Sounds",
+  "haptics": "Haptics",
+  "passwordCode": "Password code",
+  "sync": "Sync",
+  "language": "Language",
+  "about": "About"
 } 

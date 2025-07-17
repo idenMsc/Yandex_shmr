@@ -38,4 +38,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get decimalSeparator => '.';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
+  String get mainColor => 'Main color';
+
+  @override
+  String get sounds => 'Sounds';
+
+  @override
+  String get haptics => 'Haptics';
+
+  @override
+  String get passwordCode => 'Password code';
+
+  @override
+  String get sync => 'Sync';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get about => 'About';
 }

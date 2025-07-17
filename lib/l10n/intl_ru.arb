@@ -8,5 +8,14 @@
   "total": "Итого",
   "errorAccountNotFound": "Извините, произошла ошибка, счет не найден",
   "noTransactions": "Информация о транзакциях недоступна",
-  "decimalSeparator": ","
+  "decimalSeparator": ",",
+  "settings": "Настройки",
+  "darkTheme": "Тёмная тема",
+  "mainColor": "Основной цвет",
+  "sounds": "Звуки",
+  "haptics": "Хаптики",
+  "passwordCode": "Код-пароль",
+  "sync": "Синхронизация",
+  "language": "Язык",
+  "about": "О программе"
 } 

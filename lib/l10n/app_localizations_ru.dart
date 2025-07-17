@@ -38,4 +38,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get decimalSeparator => ',';
+
+  @override
+  String get settings => 'Настройки';
+
+  @override
+  String get darkTheme => 'Тёмная тема';
+
+  @override
+  String get mainColor => 'Основной цвет';
+
+  @override
+  String get sounds => 'Звуки';
+
+  @override
+  String get haptics => 'Хаптики';
+
+  @override
+  String get passwordCode => 'Код-пароль';
+
+  @override
+  String get sync => 'Синхронизация';
+
+  @override
+  String get language => 'Язык';
+
+  @override
+  String get about => 'О программе';
 }

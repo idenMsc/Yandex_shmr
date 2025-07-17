@@ -14,10 +14,12 @@ import '../../../transactions/presentation/operation_edit_screen.dart';
 import '../../../categories/presentation/bloc/category_bloc.dart';
 import 'outcome_history_screen.dart';
 import 'income_history_screen.dart';
-import '../../../transactions/transaction_bloc.dart';
-import '../../../transactions/transaction_state.dart';
-import '../../../transactions/transaction_event.dart';
+import '../../../transactions/presentation/bloc/transaction_bloc.dart';
+import '../../../transactions/presentation/bloc/transaction_state.dart';
+import '../../../transactions/presentation/bloc/transaction_event.dart';
 import 'package:shmr_25/widgets/offline_indicator.dart';
+import '../../../settings/settings_screen.dart';
+import '../../../settings/settings_cubit.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -201,7 +203,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       case 3:
         return const CategoriesPage();
       case 4:
-        return const Center(child: Text('Настройки'));
+        return BlocProvider(
+          create: (_) => SettingsCubit(),
+          child: const SettingsScreen(),
+        );
       default:
         return Container();
     }

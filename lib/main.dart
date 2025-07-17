@@ -5,7 +5,7 @@ import 'package:shmr_25/features/expenses/presentation/screens/expenses_screen.d
 import 'features/bank_accounts/presentation/bloc/wallet_bloc.dart';
 import 'features/bank_accounts/presentation/bloc/operation_bloc.dart';
 import 'features/categories/presentation/bloc/category_bloc.dart';
-import 'features/transactions/transaction_bloc.dart';
+import 'features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'l10n/app_localizations.dart';
 import 'injection_container.dart' as di;
 import 'features/categories/data/datasources/category_remote_data_source.dart';
@@ -72,6 +72,7 @@ class _AppWithSplashState extends State<_AppWithSplash> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SHMR Finance',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
         scaffoldBackgroundColor: Colors.white,
