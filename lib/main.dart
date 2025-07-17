@@ -12,6 +12,8 @@ import 'features/categories/data/datasources/category_remote_data_source.dart';
 import 'features/transactions/data/account_remote_data_source.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'screens/splash_screen.dart';
+import 'features/settings/settings_cubit.dart';
+import 'dart:ui';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +22,14 @@ void main() async {
   // Прогреваем кэш категорий и счетов
   di.sl<CategoryRemoteDataSource>().getAllCategories().catchError((_) {});
   di.sl<AccountRemoteDataSource>().getAccounts().catchError((_) {});
-  runApp(const FinanceApp());
+  final settingsCubit = SettingsCubit();
+  await settingsCubit.loadTheme();
+  runApp(
+    BlocProvider.value(
+      value: settingsCubit,
+      child: const FinanceApp(),
+    ),
+  );
 }
 
 class FinanceApp extends StatelessWidget {
@@ -55,12 +64,15 @@ class _AppWithSplash extends StatefulWidget {
   State<_AppWithSplash> createState() => _AppWithSplashState();
 }
 
-class _AppWithSplashState extends State<_AppWithSplash> {
+class _AppWithSplashState extends State<_AppWithSplash>
+    with WidgetsBindingObserver {
   bool _showSplash = true;
+  bool _showBlur = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _showSplash = false;
@@ -69,25 +81,64 @@ class _AppWithSplashState extends State<_AppWithSplash> {
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      setState(() {
+        _showBlur = true;
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _showBlur = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SHMR Finance',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ru'),
-      ],
-      home: _showSplash ? const SplashScreen() : const ExpensesScreen(),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return MaterialApp(
+          title: 'SHMR Finance',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            primarySwatch: Colors.green,
+            scaffoldBackgroundColor: Colors.white,
+          ),
+          darkTheme: ThemeData.dark(),
+          themeMode: state.useSystemTheme ? ThemeMode.system : ThemeMode.light,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'),
+            Locale('ru'),
+          ],
+          home: Stack(
+            children: [
+              _showSplash ? const SplashScreen() : const ExpensesScreen(),
+              if (_showBlur)
+                Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.2),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

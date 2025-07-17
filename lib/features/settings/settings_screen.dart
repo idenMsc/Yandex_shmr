@@ -14,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
     final settings = [
-      'Тёмная тема',
+      'Системная тема',
       'Основной цвет',
       'Звуки',
       'Хаптики',
@@ -43,14 +43,14 @@ class SettingsScreen extends StatelessWidget {
                               paddingRight: w * 0.02,
                               title: settings[index],
                               trailing: Switch(
-                                value: state.isDarkTheme,
+                                value: state.useSystemTheme,
                                 activeColor: AppColors.primary,
-                                onChanged: (val) =>
-                                    context.read<SettingsCubit>().toggleTheme(),
+                                onChanged: (val) => context
+                                    .read<SettingsCubit>()
+                                    .toggleSystemTheme(),
                               ),
                               bgColor: AppColors.surface,
                               wrapEmoji: true,
-                              // emoji: '🌙', // Можно добавить emoji или иконку
                             );
                           },
                         )
