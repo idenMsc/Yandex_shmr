@@ -103,4 +103,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get findArticle => 'Find article';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get setPin => 'Set passcode';
+
+  @override
+  String get changePin => 'Change passcode';
+
+  @override
+  String get pinSet => 'Passcode is set';
+
+  @override
+  String get pinNotSet => 'Passcode is not set';
 }

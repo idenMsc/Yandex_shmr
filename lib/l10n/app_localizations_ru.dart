@@ -103,4 +103,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get findArticle => 'Find article';
+
+  @override
+  String get password => 'Пароль';
+
+  @override
+  String get setPin => 'Установить код-пароль';
+
+  @override
+  String get changePin => 'Изменить код-пароль';
+
+  @override
+  String get pinSet => 'Код-пароль установлен';
+
+  @override
+  String get pinNotSet => 'Код-пароль не установлен';
 }
