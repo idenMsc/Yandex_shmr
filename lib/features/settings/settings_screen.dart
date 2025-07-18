@@ -200,14 +200,17 @@ class _PasscodeSettingsSheetState extends State<PasscodeSettingsSheet> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: Text(_hasPin ? l10n.changePin : l10n.setPin,
+              title: Text(
+                  _hasPin ? 'Изменить код-пароль' : 'Установить код-пароль',
                   style: theme.textTheme.bodyLarge),
               trailing:
                   const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
               onTap: _hasPin ? _changePin : _setPin,
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
-              subtitle: Text(_hasPin ? l10n.pinSet : l10n.pinNotSet),
+              subtitle: Text(_hasPin
+                  ? 'Код-пароль установлен'
+                  : 'Код-пароль не установлен'),
             ),
             if (_hasPin)
               ListTile(

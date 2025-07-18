@@ -30,10 +30,5 @@
   "noIncomeToday": "No income for today",
   "byDays": "By days",
   "byMonths": "By months",
-  "findArticle": "Find article",
-  "password": "Password",
-  "setPin": "Set passcode",
-  "changePin": "Change passcode",
-  "pinSet": "Passcode is set",
-  "pinNotSet": "Passcode is not set"
+  "findArticle": "Find article"
 } 

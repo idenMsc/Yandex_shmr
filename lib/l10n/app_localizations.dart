@@ -289,36 +289,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find article'**
   String get findArticle;
-
-  /// No description provided for @password.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get password;
-
-  /// No description provided for @setPin.
-  ///
-  /// In en, this message translates to:
-  /// **'Set passcode'**
-  String get setPin;
-
-  /// No description provided for @changePin.
-  ///
-  /// In en, this message translates to:
-  /// **'Change passcode'**
-  String get changePin;
-
-  /// No description provided for @pinSet.
-  ///
-  /// In en, this message translates to:
-  /// **'Passcode is set'**
-  String get pinSet;
-
-  /// No description provided for @pinNotSet.
-  ///
-  /// In en, this message translates to:
-  /// **'Passcode is not set'**
-  String get pinNotSet;
 }
 
 class _AppLocalizationsDelegate
