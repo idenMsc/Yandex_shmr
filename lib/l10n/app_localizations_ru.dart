@@ -75,7 +75,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mainColor => 'Основной цвет';
 
   @override
-  String get haptics => 'Вибрация';
+  String get haptics => 'Хаптики';
 
   @override
   String get passcode => 'Код доступа';
