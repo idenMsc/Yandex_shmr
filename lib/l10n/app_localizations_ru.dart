@@ -18,7 +18,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tabAccount => 'Счет';
 
   @override
-  String get tabStats => 'Статистика';
+  String get tabStats => 'Статьи';
 
   @override
   String get tabSettings => 'Настройки';
