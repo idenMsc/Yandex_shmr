@@ -22,6 +22,7 @@ import '../../../settings/settings_screen.dart';
 import '../../../settings/settings_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -174,10 +175,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               focusElevation: 0,
               highlightElevation: 0,
               disabledElevation: 0,
-              onPressed: () => TransactionCreateModal.show(
-                context,
-                isIncome: _selectedTab == 1,
-              ),
+              onPressed: () {
+                final settingsState = context.read<SettingsCubit>().state;
+                if (settingsState.isHapticsEnabled) {
+                  print('Haptic feedback: FAB pressed');
+                  HapticFeedback.vibrate();
+                }
+                TransactionCreateModal.show(
+                  context,
+                  isIncome: _selectedTab == 1,
+                );
+              },
               child: SvgPicture.asset('assets/icons/plus.svg',
                   width: 24, height: 24),
             )
@@ -186,6 +194,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         tabs: _tabs,
         selectedIndex: _selectedTab,
         onTabSelected: (index) async {
+          final settingsState = context.read<SettingsCubit>().state;
+          if (settingsState.isHapticsEnabled) {
+            print('Haptic feedback: tab selected');
+            HapticFeedback.heavyImpact();
+          }
           setState(() {
             _selectedTab = index;
           });

@@ -7,20 +7,35 @@ import '../../core/utils/constants.dart';
 class SettingsState {
   final bool isDarkTheme;
   final Color tintColor;
-  SettingsState({required this.isDarkTheme, required this.tintColor});
+  final bool isHapticsEnabled;
+  SettingsState({
+    required this.isDarkTheme,
+    required this.tintColor,
+    required this.isHapticsEnabled,
+  });
 
-  SettingsState copyWith({bool? isDarkTheme, Color? tintColor}) =>
+  SettingsState copyWith({
+    bool? isDarkTheme,
+    Color? tintColor,
+    bool? isHapticsEnabled,
+  }) =>
       SettingsState(
         isDarkTheme: isDarkTheme ?? this.isDarkTheme,
         tintColor: tintColor ?? this.tintColor,
+        isHapticsEnabled: isHapticsEnabled ?? this.isHapticsEnabled,
       );
 }
 
 class SettingsCubit extends Cubit<SettingsState> {
   static const _keyTheme = 'isDarkTheme';
   static const _keyTint = 'tintColor';
+  static const _keyHaptics = 'isHapticsEnabled';
   SettingsCubit()
-      : super(SettingsState(isDarkTheme: false, tintColor: AppColors.primary));
+      : super(SettingsState(
+          isDarkTheme: false,
+          tintColor: AppColors.primary,
+          isHapticsEnabled: true,
+        ));
 
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
@@ -33,7 +48,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
     final tintValue = prefs.getInt(_keyTint);
     final tintColor = tintValue != null ? Color(tintValue) : AppColors.primary;
-    emit(state.copyWith(isDarkTheme: isDark, tintColor: tintColor));
+    final isHaptics = prefs.getBool(_keyHaptics) ?? true;
+    emit(state.copyWith(
+      isDarkTheme: isDark,
+      tintColor: tintColor,
+      isHapticsEnabled: isHaptics,
+    ));
   }
 
   Future<void> toggleTheme() async {
@@ -47,5 +67,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_keyTint, color.value);
     emit(state.copyWith(tintColor: color));
+  }
+
+  Future<void> toggleHaptics() async {
+    final newValue = !state.isHapticsEnabled;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyHaptics, newValue);
+    emit(state.copyWith(isHapticsEnabled: newValue));
   }
 }

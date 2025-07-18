@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'language_cubit.dart';
 import 'pin_code_screen.dart';
 import 'pin_code_service.dart';
+import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -102,11 +103,23 @@ class _HapticsSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return ListTile(
-      title: Text(l10n.haptics),
-      trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
-      onTap: () {}, // TODO: реализовать настройку хаптик
-      contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return ListTile(
+          title: Text(l10n.haptics),
+          trailing: Switch(
+            value: state.isHapticsEnabled,
+            activeColor: AppColors.primary,
+            onChanged: (value) {
+              print('Haptic toggle changed to: $value');
+              HapticFeedback.heavyImpact();
+              context.read<SettingsCubit>().toggleHaptics();
+            },
+          ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+        );
+      },
     );
   }
 }
