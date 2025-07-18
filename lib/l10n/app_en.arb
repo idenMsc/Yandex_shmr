@@ -26,5 +26,9 @@
   "language": "Language",
   "noExpensesToday": "No expenses for today",
   "systemTheme": "System theme",
-  "lightTheme": "Light theme"
+  "lightTheme": "Light theme",
+  "noIncomeToday": "No income for today",
+  "byDays": "By days",
+  "byMonths": "By months",
+  "findArticle": "Find article"
 } 

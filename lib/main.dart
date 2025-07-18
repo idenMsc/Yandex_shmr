@@ -116,15 +116,83 @@ class _AppWithSplashState extends State<_AppWithSplash>
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         print('MaterialApp locale: ${widget.locale}');
+        final tint = state.tintColor;
         return MaterialApp(
           key: ValueKey(widget.locale.languageCode),
           title: 'SHMR Finance',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            primarySwatch: Colors.green,
+            primaryColor: tint,
+            colorScheme: ColorScheme.light(
+              primary: tint,
+              secondary: tint,
+              surface: Colors.white,
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: tint,
+              foregroundColor: Colors.white,
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: tint,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              centerTitle: true,
+            ),
             scaffoldBackgroundColor: Colors.white,
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              selectedItemColor: tint,
+              unselectedItemColor: Colors.grey,
+            ),
+            switchTheme: SwitchThemeData(
+              thumbColor: MaterialStateProperty.all(tint),
+              trackColor: MaterialStateProperty.all(tint.withOpacity(0.5)),
+            ),
+            iconTheme: IconThemeData(color: tint),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: tint),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(backgroundColor: tint),
+            ),
           ),
-          darkTheme: ThemeData.dark(),
+          darkTheme: ThemeData.dark().copyWith(
+            primaryColor: tint,
+            colorScheme: ColorScheme.dark(
+              primary: tint,
+              secondary: tint,
+              surface: const Color(0xFF121212),
+              onPrimary: Colors.white,
+              onSurface: Colors.white,
+            ),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: tint,
+              foregroundColor: Colors.white,
+            ),
+            appBarTheme: AppBarTheme(
+              backgroundColor: tint,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              centerTitle: true,
+            ),
+            scaffoldBackgroundColor: const Color(0xFF121212),
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              selectedItemColor: tint,
+              unselectedItemColor: Colors.grey,
+            ),
+            switchTheme: SwitchThemeData(
+              thumbColor: MaterialStateProperty.all(tint),
+              trackColor: MaterialStateProperty.all(tint.withOpacity(0.5)),
+            ),
+            iconTheme: IconThemeData(color: tint),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: tint),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(backgroundColor: tint),
+            ),
+          ),
           themeMode: state.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
           locale: widget.locale,
           localizationsDelegates: const [

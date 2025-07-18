@@ -2,35 +2,50 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/utils/constants.dart';
 
 class SettingsState {
   final bool isDarkTheme;
-  SettingsState({required this.isDarkTheme});
+  final Color tintColor;
+  SettingsState({required this.isDarkTheme, required this.tintColor});
 
-  SettingsState copyWith({bool? isDarkTheme}) =>
-      SettingsState(isDarkTheme: isDarkTheme ?? this.isDarkTheme);
+  SettingsState copyWith({bool? isDarkTheme, Color? tintColor}) =>
+      SettingsState(
+        isDarkTheme: isDarkTheme ?? this.isDarkTheme,
+        tintColor: tintColor ?? this.tintColor,
+      );
 }
 
 class SettingsCubit extends Cubit<SettingsState> {
-  static const _key = 'isDarkTheme';
-  SettingsCubit() : super(SettingsState(isDarkTheme: false));
+  static const _keyTheme = 'isDarkTheme';
+  static const _keyTint = 'tintColor';
+  SettingsCubit()
+      : super(SettingsState(isDarkTheme: false, tintColor: AppColors.primary));
 
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey(_key)) {
-      final value = prefs.getBool(_key) ?? false;
-      emit(state.copyWith(isDarkTheme: value));
+    bool isDark;
+    if (prefs.containsKey(_keyTheme)) {
+      isDark = prefs.getBool(_keyTheme) ?? false;
     } else {
-      // Если нет сохраненного значения, определяем системную тему
       final brightness = PlatformDispatcher.instance.platformBrightness;
-      emit(state.copyWith(isDarkTheme: brightness == Brightness.dark));
+      isDark = brightness == Brightness.dark;
     }
+    final tintValue = prefs.getInt(_keyTint);
+    final tintColor = tintValue != null ? Color(tintValue) : AppColors.primary;
+    emit(state.copyWith(isDarkTheme: isDark, tintColor: tintColor));
   }
 
   Future<void> toggleTheme() async {
     final newValue = !state.isDarkTheme;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_key, newValue);
+    await prefs.setBool(_keyTheme, newValue);
     emit(state.copyWith(isDarkTheme: newValue));
+  }
+
+  Future<void> setTintColor(Color color) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyTint, color.value);
+    emit(state.copyWith(tintColor: color));
   }
 }

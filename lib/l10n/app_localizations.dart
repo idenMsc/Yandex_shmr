@@ -265,6 +265,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Light theme'**
   String get lightTheme;
+
+  /// No description provided for @noIncomeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No income for today'**
+  String get noIncomeToday;
+
+  /// No description provided for @byDays.
+  ///
+  /// In en, this message translates to:
+  /// **'By days'**
+  String get byDays;
+
+  /// No description provided for @byMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'By months'**
+  String get byMonths;
+
+  /// No description provided for @findArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find article'**
+  String get findArticle;
 }
 
 class _AppLocalizationsDelegate

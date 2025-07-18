@@ -66,19 +66,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sync => 'Синхронизация';
 
   @override
-  String get about => 'О приложении';
+  String get about => 'О программе';
 
   @override
-  String get darkTheme => 'Темная тема';
+  String get darkTheme => 'Тёмная тема';
 
   @override
   String get mainColor => 'Основной цвет';
 
   @override
-  String get haptics => 'Вибрация';
+  String get haptics => 'Хаптики';
 
   @override
-  String get passcode => 'Код доступа';
+  String get passcode => 'Код пароль';
 
   @override
   String get language => 'Язык';
@@ -91,4 +91,16 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get lightTheme => 'Светлая тема';
+
+  @override
+  String get noIncomeToday => 'Нет доходов за сегодня';
+
+  @override
+  String get byDays => 'По дням';
+
+  @override
+  String get byMonths => 'По месяцам';
+
+  @override
+  String get findArticle => 'Найти статью';
 }

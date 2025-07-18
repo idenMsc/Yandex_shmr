@@ -91,4 +91,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lightTheme => 'Light theme';
+
+  @override
+  String get noIncomeToday => 'No income for today';
+
+  @override
+  String get byDays => 'By days';
+
+  @override
+  String get byMonths => 'By months';
+
+  @override
+  String get findArticle => 'Find article';
 }

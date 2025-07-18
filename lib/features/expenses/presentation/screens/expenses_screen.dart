@@ -126,7 +126,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               )
             : Text(_tabs[_selectedTab].label, style: AppTextStyles.titleLarge),
         centerTitle: true,
-        backgroundColor: AppColors.primary,
         elevation: 0,
         toolbarHeight: AppSizes.appBarHeight,
         actions: _selectedTab == 0 || _selectedTab == 1
