@@ -14,6 +14,7 @@ import 'package:worker_manager/worker_manager.dart';
 import 'screens/splash_screen.dart';
 import 'features/settings/settings_cubit.dart';
 import 'dart:ui';
+import 'features/settings/language_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,9 +25,14 @@ void main() async {
   di.sl<AccountRemoteDataSource>().getAccounts().catchError((_) {});
   final settingsCubit = SettingsCubit();
   await settingsCubit.loadTheme();
+  final languageCubit = LanguageCubit();
+  await languageCubit.loadLocale();
   runApp(
-    BlocProvider.value(
-      value: settingsCubit,
+    MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: settingsCubit),
+        BlocProvider.value(value: languageCubit),
+      ],
       child: const FinanceApp(),
     ),
   );
@@ -37,28 +43,33 @@ class FinanceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<WalletBloc>(
-          create: (context) => di.sl<WalletBloc>(),
-        ),
-        BlocProvider<OperationBloc>(
-          create: (context) => di.sl<OperationBloc>(),
-        ),
-        BlocProvider<CategoryBloc>(
-          create: (context) => di.sl<CategoryBloc>()..add(LoadCategories()),
-        ),
-        BlocProvider<TransactionBloc>(
-          create: (context) => di.sl<TransactionBloc>(),
-        ),
-      ],
-      child: const _AppWithSplash(),
+    return BlocBuilder<LanguageCubit, LanguageState>(
+      builder: (context, langState) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<WalletBloc>(
+              create: (context) => di.sl<WalletBloc>(),
+            ),
+            BlocProvider<OperationBloc>(
+              create: (context) => di.sl<OperationBloc>(),
+            ),
+            BlocProvider<CategoryBloc>(
+              create: (context) => di.sl<CategoryBloc>()..add(LoadCategories()),
+            ),
+            BlocProvider<TransactionBloc>(
+              create: (context) => di.sl<TransactionBloc>(),
+            ),
+          ],
+          child: _AppWithSplash(locale: langState.locale),
+        );
+      },
     );
   }
 }
 
 class _AppWithSplash extends StatefulWidget {
-  const _AppWithSplash({Key? key}) : super(key: key);
+  final Locale locale;
+  const _AppWithSplash({Key? key, required this.locale}) : super(key: key);
 
   @override
   State<_AppWithSplash> createState() => _AppWithSplashState();
@@ -113,6 +124,7 @@ class _AppWithSplashState extends State<_AppWithSplash>
           ),
           darkTheme: ThemeData.dark(),
           themeMode: state.useSystemTheme ? ThemeMode.system : ThemeMode.light,
+          locale: widget.locale,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

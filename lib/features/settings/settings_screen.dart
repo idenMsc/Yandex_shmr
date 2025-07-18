@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_cubit.dart';
 import '../../core/utils/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'language_cubit.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -118,11 +121,48 @@ class _LanguagePicker extends StatelessWidget {
   const _LanguagePicker();
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      title: const Text('Язык'),
+      title: Text(l10n.language),
       trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
-      onTap: () {}, // TODO: реализовать выбор языка
+      onTap: () => _showLanguageBottomSheet(context),
       contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+    );
+  }
+
+  void _showLanguageBottomSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageCubit = context.read<LanguageCubit>();
+    final currentLocale = languageCubit.state.locale;
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Русский'),
+              trailing: currentLocale.languageCode == 'ru'
+                  ? const Icon(Icons.check, color: Colors.blue)
+                  : null,
+              onTap: () {
+                languageCubit.setLocale(const Locale('ru'));
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('English'),
+              trailing: currentLocale.languageCode == 'en'
+                  ? const Icon(Icons.check, color: Colors.blue)
+                  : null,
+              onTap: () {
+                languageCubit.setLocale(const Locale('en'));
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
