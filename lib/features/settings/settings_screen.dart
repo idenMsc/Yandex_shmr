@@ -6,6 +6,8 @@ import '../../core/utils/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'language_cubit.dart';
+import 'pin_code_screen.dart';
+import 'pin_code_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -118,8 +120,109 @@ class _PasscodeSettings extends StatelessWidget {
     return ListTile(
       title: Text(l10n.passcode),
       trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
-      onTap: () {}, // TODO: реализовать настройку пароля
+      onTap: () => _showPasscodeSheet(context),
       contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+    );
+  }
+
+  void _showPasscodeSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => const PasscodeSettingsSheet(),
+    );
+  }
+}
+
+class PasscodeSettingsSheet extends StatefulWidget {
+  const PasscodeSettingsSheet({super.key});
+
+  @override
+  State<PasscodeSettingsSheet> createState() => _PasscodeSettingsSheetState();
+}
+
+class _PasscodeSettingsSheetState extends State<PasscodeSettingsSheet> {
+  bool _hasPin = false;
+  bool _loading = true;
+  final _service = PinCodeService();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPin();
+  }
+
+  Future<void> _checkPin() async {
+    final hasPin = await _service.hasPin();
+    setState(() {
+      _hasPin = hasPin;
+      _loading = false;
+    });
+  }
+
+  void _setPin() async {
+    await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            PinCodeScreen(mode: PinCodeMode.set, onSuccess: _checkPin),
+      ),
+    );
+  }
+
+  void _changePin() async {
+    await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            PinCodeScreen(mode: PinCodeMode.set, onSuccess: _checkPin),
+      ),
+    );
+  }
+
+  void _deletePin() async {
+    await _service.deletePin();
+    _checkPin();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    if (_loading) {
+      return const Padding(
+        padding: EdgeInsets.all(24.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16, left: 8, right: 8, bottom: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                  _hasPin ? 'Изменить код-пароль' : 'Установить код-пароль',
+                  style: theme.textTheme.bodyLarge),
+              trailing:
+                  const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
+              onTap: _hasPin ? _changePin : _setPin,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+              subtitle: Text(_hasPin
+                  ? 'Код-пароль установлен'
+                  : 'Код-пароль не установлен'),
+            ),
+            if (_hasPin)
+              ListTile(
+                title: const Text('Удалить код-пароль'),
+                leading: const Icon(Icons.delete, color: Colors.red),
+                onTap: _deletePin,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

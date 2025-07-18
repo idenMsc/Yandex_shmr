@@ -15,6 +15,9 @@ import 'screens/splash_screen.dart';
 import 'features/settings/settings_cubit.dart';
 import 'dart:ui';
 import 'features/settings/language_cubit.dart';
+import 'features/settings/pin_code_screen.dart';
+import 'features/settings/pin_code_service.dart';
+import 'core/utils/widgets/app_with_lock.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +82,7 @@ class _AppWithSplashState extends State<_AppWithSplash>
     with WidgetsBindingObserver {
   bool _showSplash = true;
   bool _showBlur = false;
+  bool _shouldRequestPin = false;
 
   @override
   void initState() {
@@ -98,16 +102,28 @@ class _AppWithSplashState extends State<_AppWithSplash>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
       setState(() {
         _showBlur = true;
+        _shouldRequestPin = true;
       });
     } else if (state == AppLifecycleState.resumed) {
       setState(() {
         _showBlur = false;
       });
+      if (_shouldRequestPin) {
+        _shouldRequestPin = false;
+        final hasPin = await PinCodeService().hasPin();
+        if (hasPin && mounted) {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => PinCodeScreen(mode: PinCodeMode.enter),
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -205,19 +221,8 @@ class _AppWithSplashState extends State<_AppWithSplash>
             Locale('en'),
             Locale('ru'),
           ],
-          home: Stack(
-            children: [
-              _showSplash ? const SplashScreen() : const ExpensesScreen(),
-              if (_showBlur)
-                Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.2),
-                    ),
-                  ),
-                ),
-            ],
+          home: AppWithLock(
+            child: _showSplash ? const SplashScreen() : const ExpensesScreen(),
           ),
         );
       },
