@@ -85,4 +85,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noExpensesToday => 'No expenses for today';
+
+  @override
+  String get systemTheme => 'System theme';
+
+  @override
+  String get lightTheme => 'Light theme';
 }

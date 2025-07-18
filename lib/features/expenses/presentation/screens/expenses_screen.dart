@@ -218,10 +218,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       case 3:
         return const CategoriesPage();
       case 4:
-        return BlocProvider(
-          create: (_) => SettingsCubit(),
-          child: const SettingsScreen(),
-        );
+        return const SettingsScreen();
       default:
         return Container();
     }

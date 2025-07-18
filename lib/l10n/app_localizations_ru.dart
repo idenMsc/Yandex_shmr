@@ -85,4 +85,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get noExpensesToday => 'Нет расходов за сегодня';
+
+  @override
+  String get systemTheme => 'Системная тема';
+
+  @override
+  String get lightTheme => 'Светлая тема';
 }

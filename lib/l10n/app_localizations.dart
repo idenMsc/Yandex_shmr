@@ -253,6 +253,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No expenses for today'**
   String get noExpensesToday;
+
+  /// No description provided for @systemTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'System theme'**
+  String get systemTheme;
+
+  /// No description provided for @lightTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Light theme'**
+  String get lightTheme;
 }
 
 class _AppLocalizationsDelegate

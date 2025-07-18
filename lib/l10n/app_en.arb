@@ -24,5 +24,7 @@
   "haptics": "Haptics",
   "passcode": "Passcode",
   "language": "Language",
-  "noExpensesToday": "No expenses for today"
+  "noExpensesToday": "No expenses for today",
+  "systemTheme": "System theme",
+  "lightTheme": "Light theme"
 } 

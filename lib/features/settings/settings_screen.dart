@@ -67,10 +67,9 @@ class _ThemeSwitcher extends StatelessWidget {
         return ListTile(
           title: Text(l10n.darkTheme),
           trailing: Switch(
-            value: state.useSystemTheme,
+            value: state.isDarkTheme,
             activeColor: AppColors.primary,
-            onChanged: (val) =>
-                context.read<SettingsCubit>().toggleSystemTheme(),
+            onChanged: (_) => context.read<SettingsCubit>().toggleTheme(),
           ),
           contentPadding:
               const EdgeInsets.symmetric(vertical: 3, horizontal: 14),

@@ -125,7 +125,7 @@ class _AppWithSplashState extends State<_AppWithSplash>
             scaffoldBackgroundColor: Colors.white,
           ),
           darkTheme: ThemeData.dark(),
-          themeMode: state.useSystemTheme ? ThemeMode.system : ThemeMode.light,
+          themeMode: state.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
           locale: widget.locale,
           localizationsDelegates: const [
             AppLocalizations.delegate,

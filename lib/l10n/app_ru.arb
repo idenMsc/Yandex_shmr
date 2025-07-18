@@ -24,5 +24,7 @@
   "haptics": "Вибрация",
   "passcode": "Код доступа",
   "language": "Язык",
-  "noExpensesToday": "Нет расходов за сегодня"
+  "noExpensesToday": "Нет расходов за сегодня",
+  "systemTheme": "Системная тема",
+  "lightTheme": "Светлая тема"
 } 
