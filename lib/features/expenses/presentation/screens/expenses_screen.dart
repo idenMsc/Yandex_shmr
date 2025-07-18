@@ -20,6 +20,8 @@ import '../../../transactions/presentation/bloc/transaction_event.dart';
 import 'package:shmr_25/widgets/offline_indicator.dart';
 import '../../../settings/settings_screen.dart';
 import '../../../settings/settings_cubit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -31,13 +33,24 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   int _selectedTab = 0;
 
+  List<TabItemData> _tabs = [];
+
   @override
   void initState() {
     super.initState();
+    _loadSelectedTab();
     // Гарантируем, что кошельки всегда загружены
     context.read<WalletBloc>().add(LoadWallets());
     // Гарантируем, что операции всегда загружены
     context.read<OperationBloc>().add(LoadOperations());
+  }
+
+  Future<void> _loadSelectedTab() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedTab = prefs.getInt('selectedTab') ?? 0;
+    setState(() {
+      _selectedTab = savedTab;
+    });
   }
 
   void _editAccountTitle() async {
@@ -74,31 +87,31 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     }
   }
 
-  final List<TabItemData> _tabs = [
-    TabItemData(
-      assetPath: Assets.icons.trendDown,
-      label: 'Расходы',
-    ),
-    TabItemData(
-      assetPath: Assets.icons.trendUp,
-      label: 'Доходы',
-    ),
-    TabItemData(
-      assetPath: Assets.icons.account,
-      label: 'Счет',
-    ),
-    TabItemData(
-      assetPath: Assets.icons.expenseStats,
-      label: 'Статьи',
-    ),
-    TabItemData(
-      assetPath: Assets.icons.settings,
-      label: 'Настройки',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    _tabs = [
+      TabItemData(
+        assetPath: Assets.icons.trendDown,
+        label: l10n.tabExpenses,
+      ),
+      TabItemData(
+        assetPath: Assets.icons.trendUp,
+        label: l10n.tabIncome,
+      ),
+      TabItemData(
+        assetPath: Assets.icons.account,
+        label: l10n.tabAccount,
+      ),
+      TabItemData(
+        assetPath: Assets.icons.expenseStats,
+        label: l10n.tabStats,
+      ),
+      TabItemData(
+        assetPath: Assets.icons.settings,
+        label: l10n.tabSettings,
+      ),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: _selectedTab == 2
@@ -108,7 +121,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     return Text(state.wallets.first.name,
                         style: AppTextStyles.titleLarge);
                   }
-                  return const Text('Счет', style: AppTextStyles.titleLarge);
+                  return Text(l10n.tabAccount, style: AppTextStyles.titleLarge);
                 },
               )
             : Text(_tabs[_selectedTab].label, style: AppTextStyles.titleLarge),
@@ -173,10 +186,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       bottomNavigationBar: CustomBottomBar(
         tabs: _tabs,
         selectedIndex: _selectedTab,
-        onTabSelected: (index) {
+        onTabSelected: (index) async {
           setState(() {
             _selectedTab = index;
           });
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('selectedTab', index);
           // Перезагружаем транзакции при переключении табов
           if (index == 0) {
             context
@@ -235,7 +250,8 @@ class _ExpensesTodayListState extends State<ExpensesTodayList> {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TransactionLoaded) {
           if (state.transactions.isEmpty) {
-            return const Center(child: Text('Нет расходов за сегодня'));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noExpensesToday));
           }
           return ListView.separated(
             itemCount: state.transactions.length,

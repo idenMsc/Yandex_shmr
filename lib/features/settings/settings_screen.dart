@@ -22,7 +22,7 @@ class SettingsScreen extends StatelessWidget {
           const _TintPicker(),
           const Divider(),
           ListTile(
-            title: Text('Звуки', style: theme.textTheme.bodyLarge),
+            title: Text(l10n.sounds, style: theme.textTheme.bodyLarge),
             onTap: () {},
             trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
             contentPadding:
@@ -34,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
           const _PasscodeSettings(),
           const Divider(),
           ListTile(
-            title: Text('Синхронизация', style: theme.textTheme.bodyLarge),
+            title: Text(l10n.sync, style: theme.textTheme.bodyLarge),
             onTap: () {},
             trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
             contentPadding:
@@ -44,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
           const _LanguagePicker(),
           const Divider(),
           ListTile(
-            title: Text('О программе', style: theme.textTheme.bodyLarge),
+            title: Text(l10n.about, style: theme.textTheme.bodyLarge),
             onTap: () {},
             trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
             contentPadding:
@@ -58,12 +58,14 @@ class SettingsScreen extends StatelessWidget {
 
 class _ThemeSwitcher extends StatelessWidget {
   const _ThemeSwitcher();
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return ListTile(
-          title: const Text('Системная тема'),
+          title: Text(l10n.darkTheme),
           trailing: Switch(
             value: state.useSystemTheme,
             activeColor: AppColors.primary,
@@ -80,10 +82,12 @@ class _ThemeSwitcher extends StatelessWidget {
 
 class _TintPicker extends StatelessWidget {
   const _TintPicker();
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      title: const Text('Основной цвет'),
+      title: Text(l10n.mainColor),
       trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
       onTap: () {}, // TODO: реализовать выбор цвета
       contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
@@ -93,10 +97,12 @@ class _TintPicker extends StatelessWidget {
 
 class _HapticsSwitcher extends StatelessWidget {
   const _HapticsSwitcher();
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      title: const Text('Хаптики'),
+      title: Text(l10n.haptics),
       trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
       onTap: () {}, // TODO: реализовать настройку хаптик
       contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
@@ -106,10 +112,12 @@ class _HapticsSwitcher extends StatelessWidget {
 
 class _PasscodeSettings extends StatelessWidget {
   const _PasscodeSettings();
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListTile(
-      title: const Text('Код-пароль'),
+      title: Text(l10n.passcode),
       trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
       onTap: () {}, // TODO: реализовать настройку пароля
       contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
@@ -119,6 +127,7 @@ class _PasscodeSettings extends StatelessWidget {
 
 class _LanguagePicker extends StatelessWidget {
   const _LanguagePicker();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;

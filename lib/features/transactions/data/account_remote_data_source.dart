@@ -10,28 +10,16 @@ class AccountRemoteDataSource {
 
   Future<List<Account>> getAccounts() async {
     final path = '/accounts';
-    print('AccountRemoteDataSource.getAccounts: запрашиваем $path');
     try {
       final data = await networkService.get<List<dynamic>>(path);
-      print(
-          'AccountRemoteDataSource.getAccounts: получено  [32m${data.length} [0m счетов');
       final accounts = data.map((json) => _accountFromJson(json)).toList();
-      for (final account in accounts) {
-        print(
-            'Счет: ID=${account.id}, name=${account.name}, balance=${account.balance}');
-      }
       await _saveToCache(accounts);
       return accounts;
     } catch (e) {
-      print(
-          'AccountRemoteDataSource.getAccounts: ошибка сети, пробуем из кэша ($e)');
       final cached = await _loadFromCache();
       if (cached.isNotEmpty) {
-        print(
-            'AccountRemoteDataSource.getAccounts: возвращаем счета из кэша (${cached.length})');
         return cached;
       } else {
-        print('AccountRemoteDataSource.getAccounts: кэш пустой, rethrow');
         rethrow;
       }
     }

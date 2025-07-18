@@ -115,7 +115,9 @@ class _AppWithSplashState extends State<_AppWithSplash>
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
+        print('MaterialApp locale: ${widget.locale}');
         return MaterialApp(
+          key: ValueKey(widget.locale.languageCode),
           title: 'SHMR Finance',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

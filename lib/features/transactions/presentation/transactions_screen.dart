@@ -61,8 +61,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     itemCount: state.transactions.length,
                     itemBuilder: (context, index) {
                       final t = state.transactions[index];
-                      print(
-                          'Транзакция в списке: id=${t.id}, category=${t.category}, account=${t.account}');
                       return ListTile(
                         leading: Text(t.category.emoji,
                             style: const TextStyle(fontSize: 24)),
@@ -73,8 +71,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
-                          print(
-                              'Открываю транзакцию: id=${t.id}, category=${t.category}, account=${t.account}');
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,

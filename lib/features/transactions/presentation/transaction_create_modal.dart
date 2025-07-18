@@ -10,6 +10,7 @@ import '../../../core/data/database.dart';
 import '../../bank_accounts/presentation/bloc/wallet_bloc.dart';
 import '../data/account_remote_data_source.dart';
 import '../domain/entities/account.dart';
+import '../../../l10n/app_localizations.dart';
 
 class TransactionCreateModal extends StatefulWidget {
   final bool isIncome;
@@ -44,19 +45,15 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
   @override
   void initState() {
     super.initState();
-    print('TransactionCreateModal.initState() вызван');
     _amountController.addListener(() {
       setState(() {});
     });
-    // Загружаем категории если еще не загружены
-    print('Отправляем LoadCategories в CategoryBloc');
     context.read<CategoryBloc>().add(LoadCategories());
     // Загружаем счета с сервера
     _loadAccounts();
   }
 
   Future<void> _loadAccounts() async {
-    print('Загружаем счета с сервера...');
     try {
       final accountDataSource = AccountRemoteDataSource(
         networkService: context
@@ -65,18 +62,14 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
             .networkService,
       );
       final accounts = await accountDataSource.getAccounts();
-      print('Получено ${accounts.length} счетов с сервера');
       setState(() {
         _accounts = accounts;
         _isLoadingAccounts = false;
         if (accounts.isNotEmpty) {
           _selectedAccount = accounts.first;
-          print(
-              'Автоматически выбран первый счет: ${_selectedAccount!.name} (ID: ${_selectedAccount!.id})');
         }
       });
     } catch (e) {
-      print('Ошибка загрузки счетов: $e');
       setState(() {
         _isLoadingAccounts = false;
       });
@@ -98,7 +91,6 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
       double.parse(_amountController.text) > 0;
 
   Future<void> _selectAccount() async {
-    print('_selectAccount вызван, доступно счетов: ${_accounts.length}');
     final selected = await showModalBottomSheet<Account>(
       context: context,
       builder: (context) => _accounts.isEmpty
@@ -117,18 +109,14 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
             ),
     );
     if (selected != null) {
-      print('Выбран счет: ${selected.name} (ID: ${selected.id})');
       setState(() => _selectedAccount = selected);
     }
   }
 
   Future<void> _selectCategory(
       List<category_entity.Category> categories) async {
-    print('_selectCategory вызван, доступно категорий: ${categories.length}');
     final filtered =
         categories.where((c) => c.isIncome == widget.isIncome).toList();
-    print(
-        'Отфильтровано категорий для ${widget.isIncome ? "доходов" : "расходов"}: ${filtered.length}');
     final selected = await showModalBottomSheet<category_entity.Category>(
       context: context,
       builder: (context) => filtered.isEmpty
@@ -147,7 +135,6 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
             ),
     );
     if (selected != null) {
-      print('Выбрана категория: ${selected.name} (ID: ${selected.id})');
       setState(() => _selectedCategory = selected);
     }
   }
@@ -171,23 +158,13 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
   }
 
   void _save() {
-    print('TransactionCreateModal._save() вызван');
     if (!isValid) {
-      print('Форма невалидна');
       return;
     }
 
     // Создаем дату в UTC для консистентности с сервером
     final dt = DateTime.utc(_selectedDate.year, _selectedDate.month,
         _selectedDate.day, _selectedTime.hour, _selectedTime.minute);
-
-    print(
-        'Выбранный счет: ${_selectedAccount?.name} (ID: ${_selectedAccount?.id})');
-    print(
-        'Выбранная категория: ${_selectedCategory?.name} (ID: ${_selectedCategory?.id})');
-    print('Сумма: ${_amountController.text}');
-    print('Дата (UTC): $dt');
-    print('Дата в ISO: ${dt.toIso8601String()}');
 
     // Создаем Transaction для API
     final transaction = Transaction(
@@ -211,9 +188,6 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
       updatedAt: DateTime.now(),
     );
 
-    print(
-        'Создаем транзакцию: ${transaction.amount} ${transaction.category.name}');
-    print('Отправляем CreateTransactionEvent в TransactionBloc');
     context
         .read<TransactionBloc>()
         .add(CreateTransactionEvent(transaction: transaction));
@@ -222,16 +196,14 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
 
   @override
   Widget build(BuildContext context) {
+    final h = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, categoryState) {
         final categories = categoryState is CategoryLoaded
             ? categoryState.categories
             : <category_entity.Category>[];
-
-        print(
-            'TransactionCreateModal.build: accounts=${_accounts.length}, categories=${categories.length}');
-        print('CategoryState: ${categoryState.runtimeType}');
-
         return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -246,11 +218,11 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(widget.isIncome ? 'Добавить доход' : 'Добавить расход',
+                  Text(widget.isIncome ? l10n.addIncome : l10n.addExpense,
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 16),
                   ListTile(
-                    title: Text(_selectedAccount?.name ?? 'Загрузка счетов...'),
+                    title: Text(_selectedAccount?.name ?? l10n.loadingAccounts),
                     subtitle: _selectedAccount != null
                         ? Text(
                             '${_selectedAccount!.balance} ${_selectedAccount!.currency}')
@@ -259,8 +231,7 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
                     leading: const Icon(Icons.account_balance_wallet),
                   ),
                   ListTile(
-                    title:
-                        Text(_selectedCategory?.name ?? 'Выберите категорию'),
+                    title: Text(_selectedCategory?.name ?? l10n.selectCategory),
                     leading: Text(_selectedCategory?.emoji ?? '📂',
                         style: const TextStyle(fontSize: 24)),
                     onTap: () => _selectCategory(categories),
@@ -269,22 +240,22 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
                     controller: _amountController,
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(labelText: 'Сумма'),
+                    decoration: InputDecoration(labelText: l10n.amount),
                   ),
                   Row(
                     children: [
                       Expanded(
                         child: ListTile(
-                          title: Text(
-                              'Дата: ${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}'),
+                          title: Text(l10n.date +
+                              ': ${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}'),
                           leading: const Icon(Icons.date_range),
                           onTap: _selectDate,
                         ),
                       ),
                       Expanded(
                         child: ListTile(
-                          title:
-                              Text('Время: ${_selectedTime.format(context)}'),
+                          title: Text(
+                              l10n.time + ': ${_selectedTime.format(context)}'),
                           leading: const Icon(Icons.access_time),
                           onTap: _selectTime,
                         ),
@@ -293,12 +264,12 @@ class _TransactionCreateModalState extends State<TransactionCreateModal> {
                   ),
                   TextField(
                     controller: _commentController,
-                    decoration: const InputDecoration(labelText: 'Комментарий'),
+                    decoration: InputDecoration(labelText: l10n.comment),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: isValid ? _save : null,
-                    child: const Text('Сохранить'),
+                    child: Text(l10n.save),
                   ),
                 ],
               ),

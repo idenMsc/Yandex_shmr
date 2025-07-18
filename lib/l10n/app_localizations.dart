@@ -98,41 +98,89 @@ abstract class AppLocalizations {
     Locale('ru')
   ];
 
-  /// No description provided for @appTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'SHMR Finance'**
-  String get appTitle;
-
-  /// No description provided for @navBarExpenses.
+  /// No description provided for @tabExpenses.
   ///
   /// In en, this message translates to:
   /// **'Expenses'**
-  String get navBarExpenses;
+  String get tabExpenses;
 
-  /// No description provided for @navBarIncome.
+  /// No description provided for @tabIncome.
   ///
   /// In en, this message translates to:
   /// **'Income'**
-  String get navBarIncome;
+  String get tabIncome;
 
-  /// No description provided for @navBarAccount.
+  /// No description provided for @tabAccount.
   ///
   /// In en, this message translates to:
   /// **'Account'**
-  String get navBarAccount;
+  String get tabAccount;
 
-  /// No description provided for @navBarStats.
+  /// No description provided for @tabStats.
   ///
   /// In en, this message translates to:
   /// **'Stats'**
-  String get navBarStats;
+  String get tabStats;
 
-  /// No description provided for @navBarSettings.
+  /// No description provided for @tabSettings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
-  String get navBarSettings;
+  String get tabSettings;
+
+  /// No description provided for @addIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Add income'**
+  String get addIncome;
+
+  /// No description provided for @addExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add expense'**
+  String get addExpense;
+
+  /// No description provided for @loadingAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading accounts...'**
+  String get loadingAccounts;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select category'**
+  String get selectCategory;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get time;
+
+  /// No description provided for @comment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get comment;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
 
   /// No description provided for @total.
   ///
@@ -140,29 +188,35 @@ abstract class AppLocalizations {
   /// **'Total'**
   String get total;
 
-  /// No description provided for @errorAccountNotFound.
+  /// No description provided for @navBarAccount.
   ///
   /// In en, this message translates to:
-  /// **'Sorry, an error occurred, account not found'**
-  String get errorAccountNotFound;
-
-  /// No description provided for @noTransactions.
-  ///
-  /// In en, this message translates to:
-  /// **'No transaction information available'**
-  String get noTransactions;
-
-  /// No description provided for @decimalSeparator.
-  ///
-  /// In en, this message translates to:
-  /// **'.'**
-  String get decimalSeparator;
+  /// **'Account'**
+  String get navBarAccount;
 
   /// No description provided for @settings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
+
+  /// No description provided for @sounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Sounds'**
+  String get sounds;
+
+  /// No description provided for @sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get sync;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
 
   /// No description provided for @darkTheme.
   ///
@@ -176,29 +230,17 @@ abstract class AppLocalizations {
   /// **'Main color'**
   String get mainColor;
 
-  /// No description provided for @sounds.
-  ///
-  /// In en, this message translates to:
-  /// **'Sounds'**
-  String get sounds;
-
   /// No description provided for @haptics.
   ///
   /// In en, this message translates to:
   /// **'Haptics'**
   String get haptics;
 
-  /// No description provided for @passwordCode.
+  /// No description provided for @passcode.
   ///
   /// In en, this message translates to:
-  /// **'Password code'**
-  String get passwordCode;
-
-  /// No description provided for @sync.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync'**
-  String get sync;
+  /// **'Passcode'**
+  String get passcode;
 
   /// No description provided for @language.
   ///
@@ -206,11 +248,11 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
-  /// No description provided for @about.
+  /// No description provided for @noExpensesToday.
   ///
   /// In en, this message translates to:
-  /// **'About'**
-  String get about;
+  /// **'No expenses for today'**
+  String get noExpensesToday;
 }
 
 class _AppLocalizationsDelegate
