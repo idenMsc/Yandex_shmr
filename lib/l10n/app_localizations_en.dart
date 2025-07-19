@@ -9,33 +9,104 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'SHMR Finance';
+  String get tabExpenses => 'Expenses';
 
   @override
-  String get navBarExpenses => 'Expenses';
+  String get tabIncome => 'Income';
 
   @override
-  String get navBarIncome => 'Income';
+  String get tabAccount => 'Account';
 
   @override
-  String get navBarAccount => 'Account';
+  String get tabStats => 'Stats';
 
   @override
-  String get navBarStats => 'Stats';
+  String get tabSettings => 'Settings';
 
   @override
-  String get navBarSettings => 'Settings';
+  String get addIncome => 'Add income';
+
+  @override
+  String get addExpense => 'Add expense';
+
+  @override
+  String get loadingAccounts => 'Loading accounts...';
+
+  @override
+  String get selectCategory => 'Select category';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String get comment => 'Comment';
+
+  @override
+  String get save => 'Save';
 
   @override
   String get total => 'Total';
 
   @override
-  String get errorAccountNotFound =>
-      'Sorry, an error occurred, account not found';
+  String get navBarAccount => 'Account';
 
   @override
-  String get noTransactions => 'No transaction information available';
+  String get settings => 'Settings';
 
   @override
-  String get decimalSeparator => '.';
+  String get sounds => 'Sounds';
+
+  @override
+  String get sync => 'Sync';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get darkTheme => 'Dark theme';
+
+  @override
+  String get mainColor => 'Main color';
+
+  @override
+  String get haptics => 'Haptics';
+
+  @override
+  String get passcode => 'Passcode';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get noExpensesToday => 'No expenses for today';
+
+  @override
+  String get systemTheme => 'System theme';
+
+  @override
+  String get lightTheme => 'Light theme';
+
+  @override
+  String get noIncomeToday => 'No income for today';
+
+  @override
+  String get byDays => 'By days';
+
+  @override
+  String get byMonths => 'By months';
+
+  @override
+  String get findArticle => 'Find article';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get cancel => 'Cancel';
 }

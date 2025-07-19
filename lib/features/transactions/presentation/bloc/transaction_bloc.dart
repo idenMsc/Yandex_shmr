@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'data/transaction_repository_impl.dart';
-import 'data/account_remote_data_source.dart';
+import '../../data/transaction_repository_impl.dart';
+import '../../data/account_remote_data_source.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
-import '../../../core/error/global_ui_bloc.dart';
-import '../../../injection_container.dart';
+import '../../../../../core/error/global_ui_bloc.dart';
+import '../../../../../injection_container.dart';
 
 class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final TransactionRepositoryImpl transactionRepository;

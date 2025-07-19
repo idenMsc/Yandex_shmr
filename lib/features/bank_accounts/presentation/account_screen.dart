@@ -71,119 +71,122 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider<TransactionChartService>(
       create: (context) => TransactionChartService(
         transactionRepository: sl<TransactionRepositoryImpl>(),
         accountRemoteDataSource: sl<AccountRemoteDataSource>(),
       ),
-      child: Column(
-        children: [
-          BlocBuilder<WalletBloc, WalletState>(
-            builder: (context, state) {
-              if (state is WalletsLoading) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                );
-              } else if (state is WalletsLoaded && state.wallets.isNotEmpty) {
-                final wallet = state.wallets.first;
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: AppSizes.avatarRadius,
-                        child: Text('💰'),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        AppLocalizations.of(context)!.total,
-                        style: AppTextStyles.bodyLarge,
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: _toggleBalance,
-                        child: AnimatedOpacity(
-                          opacity: showBalance ? 1 : 0.3,
-                          duration: const Duration(milliseconds: 300),
-                          child: Text(
-                            showBalance
-                                ? '${wallet.balance} ${wallet.currency}'
-                                : '••••••',
-                            style: AppTextStyles.bodyLarge,
+      child: Scaffold(
+        body: Column(
+          children: [
+            BlocBuilder<WalletBloc, WalletState>(
+              builder: (context, state) {
+                if (state is WalletsLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                } else if (state is WalletsLoaded && state.wallets.isNotEmpty) {
+                  final wallet = state.wallets.first;
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundColor: Colors.white,
+                          radius: AppSizes.avatarRadius,
+                          child: Text('💰'),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          AppLocalizations.of(context)!.total,
+                          style: AppTextStyles.bodyLarge,
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: _toggleBalance,
+                          child: AnimatedOpacity(
+                            opacity: showBalance ? 1 : 0.3,
+                            duration: const Duration(milliseconds: 300),
+                            child: Text(
+                              showBalance
+                                  ? '${wallet.balance} ${wallet.currency}'
+                                  : '••••••',
+                              style: AppTextStyles.bodyLarge,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      SvgPicture.asset(
-                        'assets/icons/more_vert.svg',
-                        width: 24,
-                        height: 24,
-                        colorFilter: const ColorFilter.mode(
-                          AppColors.tertiary,
-                          BlendMode.srcIn,
+                        const SizedBox(width: 16),
+                        SvgPicture.asset(
+                          'assets/icons/more_vert.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.tertiary,
+                            BlendMode.srcIn,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (state is WalletsError) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Ошибка: ${state.message}',
-                    style: AppTextStyles.bodyLarge
-                        .copyWith(color: AppColors.error),
-                  ),
-                );
-              } else {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text('Нет данных о кошельке'),
-                );
-              }
-            },
-          ),
-          ListTile(
-            onTap: _selectCurrency,
-            leading: Text(
-              AppLocalizations.of(context)!.navBarAccount,
-              style: AppTextStyles.bodyLarge,
+                      ],
+                    ),
+                  );
+                } else if (state is WalletsError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Ошибка: ${state.message}',
+                      style: AppTextStyles.bodyLarge
+                          .copyWith(color: AppColors.error),
+                    ),
+                  );
+                } else {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Нет данных о кошельке'),
+                  );
+                }
+              },
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                BlocBuilder<WalletBloc, WalletState>(
-                  builder: (context, state) {
-                    if (state is WalletsLoaded && state.wallets.isNotEmpty) {
-                      return Text(state.wallets.first.currency,
+            ListTile(
+              onTap: _selectCurrency,
+              leading: Text(
+                AppLocalizations.of(context)!.navBarAccount,
+                style: AppTextStyles.bodyLarge,
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  BlocBuilder<WalletBloc, WalletState>(
+                    builder: (context, state) {
+                      if (state is WalletsLoaded && state.wallets.isNotEmpty) {
+                        return Text(state.wallets.first.currency,
+                            style: AppTextStyles.bodyLarge);
+                      }
+                      return Text(selectedCurrency,
                           style: AppTextStyles.bodyLarge);
-                    }
-                    return Text(selectedCurrency,
-                        style: AppTextStyles.bodyLarge);
-                  },
-                ),
-                const SizedBox(width: 8),
-                SvgPicture.asset(
-                  'assets/icons/more_vert.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.tertiary,
-                    BlendMode.srcIn,
+                    },
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  SvgPicture.asset(
+                    'assets/icons/more_vert.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.tertiary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          // График транзакций
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: TransactionChartWidget(),
-          ),
-          const Spacer(),
-        ],
+            // График транзакций
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: TransactionChartWidget(),
+            ),
+            const Spacer(),
+          ],
+        ),
       ),
     );
   }

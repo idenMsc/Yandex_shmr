@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const baseUrl = 'https://shmr-finance.ru/api/v1';
-const token = '';
+const token = 'QAv0gBBhHLwYXHZBDt4MR6Kr';
 
 // Цвета
 class AppColors {

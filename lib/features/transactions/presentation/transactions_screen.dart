@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../transaction_bloc.dart';
-import '../transaction_event.dart';
-import '../transaction_state.dart';
+import 'bloc/transaction_bloc.dart';
+import 'bloc/transaction_event.dart';
+import 'bloc/transaction_state.dart';
 import '../domain/entities/transaction.dart';
 
 class TransactionsScreen extends StatefulWidget {
@@ -61,8 +61,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     itemCount: state.transactions.length,
                     itemBuilder: (context, index) {
                       final t = state.transactions[index];
-                      print(
-                          'Транзакция в списке: id=${t.id}, category=${t.category}, account=${t.account}');
                       return ListTile(
                         leading: Text(t.category.emoji,
                             style: const TextStyle(fontSize: 24)),
@@ -73,8 +71,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         onTap: () {
-                          print(
-                              'Открываю транзакцию: id=${t.id}, category=${t.category}, account=${t.account}');
                           showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,

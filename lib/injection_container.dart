@@ -20,7 +20,7 @@ import 'package:shmr_25/core/connection_watcher.dart';
 import 'package:shmr_25/features/transactions/data/transaction_remote_data_source.dart';
 import 'package:shmr_25/features/transactions/data/account_remote_data_source.dart';
 import 'package:shmr_25/features/transactions/data/transaction_repository_impl.dart';
-import 'package:shmr_25/features/transactions/transaction_bloc.dart';
+import 'package:shmr_25/features/transactions/presentation/bloc/transaction_bloc.dart';
 import 'features/transactions/domain/services/transaction_chart_service.dart';
 import 'core/error/global_ui_bloc.dart';
 import 'core/network/connection_status_bloc.dart';

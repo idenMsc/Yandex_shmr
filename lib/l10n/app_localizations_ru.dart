@@ -9,33 +9,104 @@ class AppLocalizationsRu extends AppLocalizations {
   AppLocalizationsRu([String locale = 'ru']) : super(locale);
 
   @override
-  String get appTitle => 'SHMR Finance';
+  String get tabExpenses => 'Расходы';
 
   @override
-  String get navBarExpenses => 'Расходы';
+  String get tabIncome => 'Доходы';
 
   @override
-  String get navBarIncome => 'Доходы';
+  String get tabAccount => 'Счет';
 
   @override
-  String get navBarAccount => 'Счет';
+  String get tabStats => 'Статьи';
 
   @override
-  String get navBarStats => 'Статьи';
+  String get tabSettings => 'Настройки';
 
   @override
-  String get navBarSettings => 'Настройки';
+  String get addIncome => 'Добавить доход';
+
+  @override
+  String get addExpense => 'Добавить расход';
+
+  @override
+  String get loadingAccounts => 'Загрузка счетов...';
+
+  @override
+  String get selectCategory => 'Выберите категорию';
+
+  @override
+  String get amount => 'Сумма';
+
+  @override
+  String get date => 'Дата';
+
+  @override
+  String get time => 'Время';
+
+  @override
+  String get comment => 'Комментарий';
+
+  @override
+  String get save => 'Сохранить';
 
   @override
   String get total => 'Итого';
 
   @override
-  String get errorAccountNotFound =>
-      'Извините, произошла ошибка, счет не найден';
+  String get navBarAccount => 'Счет';
 
   @override
-  String get noTransactions => 'Информация о транзакциях недоступна';
+  String get settings => 'Настройки';
 
   @override
-  String get decimalSeparator => ',';
+  String get sounds => 'Звуки';
+
+  @override
+  String get sync => 'Синхронизация';
+
+  @override
+  String get about => 'О приложении';
+
+  @override
+  String get darkTheme => 'Темная тема';
+
+  @override
+  String get mainColor => 'Основной цвет';
+
+  @override
+  String get haptics => 'Хаптики';
+
+  @override
+  String get passcode => 'Код доступа';
+
+  @override
+  String get language => 'Язык';
+
+  @override
+  String get noExpensesToday => 'Нет расходов за сегодня';
+
+  @override
+  String get systemTheme => 'Системная тема';
+
+  @override
+  String get lightTheme => 'Светлая тема';
+
+  @override
+  String get noIncomeToday => 'No income for today';
+
+  @override
+  String get byDays => 'By days';
+
+  @override
+  String get byMonths => 'By months';
+
+  @override
+  String get findArticle => 'Find article';
+
+  @override
+  String get done => 'Готово';
+
+  @override
+  String get cancel => 'Отмена';
 }
