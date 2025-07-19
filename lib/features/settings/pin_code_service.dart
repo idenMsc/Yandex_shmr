@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_auth/local_auth.dart';
 
 class PinCodeService {
   static const _pinKey = 'user_pin_code';
@@ -31,8 +32,40 @@ class PinCodeService {
 }
 
 class BiometricService {
-  Future<bool> isBiometricAvailable() async => false;
-  Future<bool> isBiometricEnabled() async => false;
-  Future<void> setBiometricEnabled(bool enabled) async {}
-  Future<bool> authenticate() async => false;
+  static const _biometricKey = 'biometric_enabled';
+  final LocalAuthentication _auth = LocalAuthentication();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  Future<bool> isBiometricAvailable() async {
+    try {
+      final canCheck = await _auth.canCheckBiometrics;
+      final isSupported = await _auth.isDeviceSupported();
+      // Временно для тестирования на эмуляторе
+      return true; // canCheck && isSupported;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> authenticate() async {
+    try {
+      final result = await _auth.authenticate(
+        localizedReason: 'Пожалуйста, подтвердите личность',
+        options:
+            const AuthenticationOptions(biometricOnly: true, stickyAuth: true),
+      );
+      return result;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> setBiometricEnabled(bool enabled) async {
+    await _storage.write(key: _biometricKey, value: enabled ? '1' : '0');
+  }
+
+  Future<bool> isBiometricEnabled() async {
+    final value = await _storage.read(key: _biometricKey);
+    return value == '1';
+  }
 }

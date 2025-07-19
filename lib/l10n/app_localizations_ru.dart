@@ -103,4 +103,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get findArticle => 'Find article';
+
+  @override
+  String get done => 'Готово';
+
+  @override
+  String get cancel => 'Отмена';
 }

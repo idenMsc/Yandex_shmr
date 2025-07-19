@@ -103,4 +103,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get findArticle => 'Find article';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get cancel => 'Cancel';
 }

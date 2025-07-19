@@ -18,6 +18,7 @@ import 'features/settings/language_cubit.dart';
 import 'features/settings/pin_code_screen.dart';
 import 'features/settings/pin_code_service.dart';
 import 'core/utils/widgets/app_with_lock.dart';
+import 'core/utils/widgets/blur_guard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,16 +79,12 @@ class _AppWithSplash extends StatefulWidget {
   State<_AppWithSplash> createState() => _AppWithSplashState();
 }
 
-class _AppWithSplashState extends State<_AppWithSplash>
-    with WidgetsBindingObserver {
+class _AppWithSplashState extends State<_AppWithSplash> {
   bool _showSplash = true;
-  bool _showBlur = false;
-  bool _shouldRequestPin = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _showSplash = false;
@@ -96,42 +93,9 @@ class _AppWithSplashState extends State<_AppWithSplash>
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive) {
-      setState(() {
-        _showBlur = true;
-        _shouldRequestPin = true;
-      });
-    } else if (state == AppLifecycleState.resumed) {
-      setState(() {
-        _showBlur = false;
-      });
-      if (_shouldRequestPin) {
-        _shouldRequestPin = false;
-        final hasPin = await PinCodeService().hasPin();
-        if (hasPin && mounted) {
-          await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PinCodeScreen(mode: PinCodeMode.enter),
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
-        print('MaterialApp locale: ${widget.locale}');
         final tint = state.tintColor;
         return MaterialApp(
           key: ValueKey(widget.locale.languageCode),
@@ -221,8 +185,11 @@ class _AppWithSplashState extends State<_AppWithSplash>
             Locale('en'),
             Locale('ru'),
           ],
-          home: AppWithLock(
-            child: _showSplash ? const SplashScreen() : const ExpensesScreen(),
+          home: BlurGuard(
+            child: AppWithLock(
+              child:
+                  _showSplash ? const SplashScreen() : const ExpensesScreen(),
+            ),
           ),
         );
       },

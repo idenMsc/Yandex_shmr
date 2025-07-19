@@ -9,6 +9,7 @@ import 'language_cubit.dart';
 import 'pin_code_screen.dart';
 import 'pin_code_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -88,11 +89,96 @@ class _TintPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return ListTile(
-      title: Text(l10n.mainColor),
-      trailing: const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
-      onTap: () {}, // TODO: реализовать выбор цвета
-      contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return ListTile(
+          title: Text(l10n.mainColor),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: state.tintColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Color(0x4d3c3c43)),
+            ],
+          ),
+          onTap: () => _showColorPicker(context),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+        );
+      },
+    );
+  }
+
+  void _showColorPicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    Color currentColor = context.read<SettingsCubit>().state.tintColor;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.mainColor,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ColorPicker(
+                  pickerColor: currentColor,
+                  onColorChanged: (color) {
+                    setState(() {
+                      currentColor = color;
+                    });
+                  },
+                  colorPickerWidth: MediaQuery.of(context).size.width * 0.9,
+                  pickerAreaHeightPercent: 0.7,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(l10n.cancel),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<SettingsCubit>()
+                            .setTintColor(currentColor);
+                        Navigator.pop(context);
+                      },
+                      child: Text(l10n.done),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -111,7 +197,6 @@ class _HapticsSwitcher extends StatelessWidget {
             value: state.isHapticsEnabled,
             activeColor: AppColors.primary,
             onChanged: (value) {
-              print('Haptic toggle changed to: $value');
               HapticFeedback.heavyImpact();
               context.read<SettingsCubit>().toggleHaptics();
             },
@@ -157,12 +242,16 @@ class PasscodeSettingsSheet extends StatefulWidget {
 class _PasscodeSettingsSheetState extends State<PasscodeSettingsSheet> {
   bool _hasPin = false;
   bool _loading = true;
+  bool _biometricEnabled = false;
+  bool _biometricAvailable = false;
   final _service = PinCodeService();
+  final _biometricService = BiometricService();
 
   @override
   void initState() {
     super.initState();
     _checkPin();
+    _checkBiometric();
   }
 
   Future<void> _checkPin() async {
@@ -170,6 +259,36 @@ class _PasscodeSettingsSheetState extends State<PasscodeSettingsSheet> {
     setState(() {
       _hasPin = hasPin;
       _loading = false;
+    });
+    if (hasPin) {
+      _checkBiometric();
+    }
+  }
+
+  Future<void> _checkBiometric() async {
+    final available = await _biometricService.isBiometricAvailable();
+    final enabled = await _biometricService.isBiometricEnabled();
+    setState(() {
+      _biometricAvailable = available;
+      _biometricEnabled = enabled;
+    });
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    if (value) {
+      final available = await _biometricService.isBiometricAvailable();
+      if (!available) {
+        messenger.showSnackBar(
+          SnackBar(content: Text('Биометрия недоступна на этом устройстве')),
+        );
+        return;
+      }
+    }
+    await _biometricService.setBiometricEnabled(value);
+    setState(() {
+      _biometricEnabled = value;
     });
   }
 
@@ -230,6 +349,14 @@ class _PasscodeSettingsSheetState extends State<PasscodeSettingsSheet> {
                 title: const Text('Удалить код-пароль'),
                 leading: const Icon(Icons.delete, color: Colors.red),
                 onTap: _deletePin,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
+              ),
+            if (_hasPin && _biometricAvailable)
+              SwitchListTile(
+                title: const Text('Разблокировка по биометрии'),
+                value: _biometricEnabled,
+                onChanged: _toggleBiometric,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 3, horizontal: 14),
               ),

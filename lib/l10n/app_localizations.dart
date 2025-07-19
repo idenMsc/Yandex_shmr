@@ -289,6 +289,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Find article'**
   String get findArticle;
+
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get done;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

@@ -178,7 +178,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               onPressed: () {
                 final settingsState = context.read<SettingsCubit>().state;
                 if (settingsState.isHapticsEnabled) {
-                  print('Haptic feedback: FAB pressed');
                   HapticFeedback.vibrate();
                 }
                 TransactionCreateModal.show(
@@ -196,7 +195,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         onTabSelected: (index) async {
           final settingsState = context.read<SettingsCubit>().state;
           if (settingsState.isHapticsEnabled) {
-            print('Haptic feedback: tab selected');
             HapticFeedback.heavyImpact();
           }
           setState(() {

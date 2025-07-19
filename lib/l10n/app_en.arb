@@ -30,5 +30,7 @@
   "noIncomeToday": "No income for today",
   "byDays": "By days",
   "byMonths": "By months",
-  "findArticle": "Find article"
+  "findArticle": "Find article",
+  "done": "Done",
+  "cancel": "Cancel"
 } 

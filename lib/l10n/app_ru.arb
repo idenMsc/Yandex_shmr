@@ -26,5 +26,7 @@
   "language": "Язык",
   "noExpensesToday": "Нет расходов за сегодня",
   "systemTheme": "Системная тема",
-  "lightTheme": "Светлая тема"
+  "lightTheme": "Светлая тема",
+  "done": "Готово",
+  "cancel": "Отмена"
 } 
