@@ -1,5 +1,7 @@
 import '../domain/entities/transaction.dart';
 import 'transaction_remote_data_source.dart';
+import '../../../core/network_service.dart';
+import '../../../core/network_client.dart';
 
 // Мок-данные (можно заменить на свои)
 final _mockTransactions = <Transaction>[
@@ -46,7 +48,8 @@ final _mockTransactions = <Transaction>[
 ];
 
 class MockTransactionRemoteDataSource extends TransactionRemoteDataSource {
-  MockTransactionRemoteDataSource() : super(baseUrl: '', token: '');
+  MockTransactionRemoteDataSource()
+      : super(networkService: NetworkService(NetworkClient()));
 
   @override
   Future<List<Transaction>> getTransactionsByPeriod({

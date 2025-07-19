@@ -1,5 +1,7 @@
 import '../domain/entities/account.dart';
 import 'account_remote_data_source.dart';
+import '../../../core/network_service.dart';
+import '../../../core/network_client.dart';
 
 // Мок-данные (можно заменить на свои)
 final _mockAccounts = <Account>[
@@ -24,7 +26,8 @@ final _mockAccounts = <Account>[
 ];
 
 class MockAccountRemoteDataSource extends AccountRemoteDataSource {
-  MockAccountRemoteDataSource() : super(baseUrl: '', token: '');
+  MockAccountRemoteDataSource()
+      : super(networkService: NetworkService(NetworkClient()));
 
   @override
   Future<List<Account>> getAccounts() async {

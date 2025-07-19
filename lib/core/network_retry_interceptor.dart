@@ -1,15 +1,18 @@
 import 'package:dio/dio.dart';
 import 'dart:math';
-import 'network_config.dart';
 
 class NetworkRetryInterceptor extends Interceptor {
+  static const int defaultMaxRetries = 3;
+  static const int defaultRetryDelaySeconds = 2;
+
   final int maxRetries;
-  final int baseDelaySeconds;
+  final int retryDelaySeconds;
 
   NetworkRetryInterceptor({
-    this.maxRetries = NetworkConfig.maxRetries,
-    this.baseDelaySeconds = NetworkConfig.retryDelaySeconds,
-  });
+    int? maxRetries,
+    int? retryDelaySeconds,
+  })  : maxRetries = maxRetries ?? defaultMaxRetries,
+        retryDelaySeconds = retryDelaySeconds ?? defaultRetryDelaySeconds;
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
@@ -55,7 +58,7 @@ class NetworkRetryInterceptor extends Interceptor {
   }
 
   int _calculateDelay(int retryCount) {
-    final exponentialDelay = baseDelaySeconds * pow(2, retryCount - 1);
+    final exponentialDelay = retryDelaySeconds * pow(2, retryCount - 1);
     final jitter = Random().nextInt(1000) / 1000;
     return (exponentialDelay + jitter).round();
   }

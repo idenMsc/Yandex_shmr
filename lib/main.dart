@@ -19,9 +19,11 @@ import 'features/settings/pin_code_screen.dart';
 import 'features/settings/pin_code_service.dart';
 import 'core/utils/widgets/app_with_lock.dart';
 import 'core/utils/widgets/blur_guard.dart';
+import 'core/config/config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Config().init();
   await workerManager.init(); // инициализация пула изолятов
   await di.init(); // Инициализация базы данных и DI
   // Прогреваем кэш категорий и счетов

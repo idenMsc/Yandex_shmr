@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'network_retry_interceptor.dart';
 import 'network_config.dart';
 import 'network_deserialize_interceptor.dart';
+import 'package:shmr_25/core/config/config.dart';
 
 class NetworkClient {
   late final Dio _dio;
@@ -9,7 +10,7 @@ class NetworkClient {
   NetworkClient() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: NetworkConfig.baseUrl,
+        baseUrl: Config.baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {
@@ -29,7 +30,7 @@ class NetworkClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          options.headers['Authorization'] = 'Bearer ${NetworkConfig.token}';
+          options.headers['Authorization'] = 'Bearer ${Config.apiKey}';
           handler.next(options);
         },
         onResponse: (response, handler) {

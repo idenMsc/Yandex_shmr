@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-const baseUrl = 'https://shmr-finance.ru/api/v1';
-const token = 'QAv0gBBhHLwYXHZBDt4MR6Kr';
+// baseUrl и token теперь берутся из Config
 
 // Цвета
 class AppColors {
