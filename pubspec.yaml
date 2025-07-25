@@ -47,6 +47,8 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   drift_dev: ^2.27.0
   intl_utils: ^2.8.4
+  mockito: ^5.4.4
+  coverage: ^1.15.0
   golden_toolkit: ^0.15.0
 
 flutter:
